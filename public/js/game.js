@@ -6,7 +6,7 @@ function preload() {
 }
 
 function create() {
-
+    // HOLA
     game.stage.backgroundColor = "#ff5599";    
 
 }
