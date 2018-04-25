@@ -1,16 +1,32 @@
 function FirstScene(game) {
+
     this.game = game;
+
+
     this.preload = function () {
+        this.game.load.tilemap('desert', 'assets/maps/desert.json', null, Phaser.Tilemap.TILED_JSON);
+        this.game.load.image('tiles', 'assets/images/tmw_desert_spacing.png');
+
         this.player = new Player(this.game);
         this.player.preload();
 
     }
 
     this.create = function () {
-        this.game.stage.backgroundColor = "#ff5900";
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+        
+        map = game.add.tilemap('desert');
+
+        map.addTilesetImage('Desert', 'tiles');
+
+        layer = map.createLayer('Ground');
+
+        layer.resizeWorld();
+
+
         this.player.create(100, 100);
 
-        game.physics.arcade.enable(this.player.getSprite());
+        this.game.physics.arcade.enable(this.player.getSprite());
     }
 
     this.listener = function () {
@@ -29,9 +45,9 @@ function FirstScene(game) {
         // La apunta al mouse, siempre
         var dy = this.game.input.mousePointer.y - this.player.getSprite().y;
         var dx = this.game.input.mousePointer.x - this.player.getSprite().x;
-    
+
         var angle = Math.atan2(dy, dx);
-    
+
         this.player.getSprite().rotation = angle;
     }
 
