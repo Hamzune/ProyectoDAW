@@ -1,15 +1,26 @@
-function Renderer(game){
+function Renderer(game) {
     this.game = game;
-    
-    this.create = function(){
-
+    this.scene = new FirstScene(game);
+    this.preload = function () {
+        this.scene.preload();
     }
 
-    this.update = function() {
-
+    this.create = function () {
+        this.scene.create();
     }
 
-    this.preload = function() {
+    this.update = function () {
+        this.scene.update();
+    }
 
+    this.render = function () {
+        this.scene.render();
+    }
+
+    this.changeScene = function(nScene) {
+        this.scene.stop();
+        this.scene = nScene;
+        this.scene.preload();
+        this.scene.create();
     }
 }
