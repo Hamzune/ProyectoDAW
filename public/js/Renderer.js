@@ -17,9 +17,9 @@ function Renderer(game) {
         this.scene.render();
     }
 
-    this.changeScene = function(nScene) {
+    this.changeScene = function(newScene) {
         this.scene.stop();
-        this.scene = nScene;
+        this.scene = newScene;
         this.scene.preload();
         this.scene.create();
     }
