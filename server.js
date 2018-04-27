@@ -25,8 +25,8 @@ io.on('connection', function (socket) {
     socket.on('newPlayer', function () {
         let data = {
             id: uniqid(),
-            x: Math.random() * 900,
-            y: 500,
+            x: Math.random() * 1920,
+            y: Math.random() * 900,
         };
         server.players.push(data);
         socket.player = data;

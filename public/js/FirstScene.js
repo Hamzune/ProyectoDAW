@@ -1,6 +1,6 @@
 function FirstScene(game) {
-
     this.game = game;
+    this.inputEnabled = true;
     this.map = {};
 
     this.portals = [];
@@ -9,6 +9,7 @@ function FirstScene(game) {
     this.players = [];
     this.client;
 
+    this.player = null;
     this.myId = -1;
 
     this.preload = function () {
@@ -57,7 +58,8 @@ function FirstScene(game) {
                 let new_position = {
                     id: that.myId,
                     x: player.getPosition().x,
-                    y: player.getPosition().y
+                    y: player.getPosition().y,
+                    rotation: player.getRotation()
                 };
                 that.client.socket.emit('player_position_refresh', new_position);
             }
@@ -70,6 +72,7 @@ function FirstScene(game) {
                 // Si ya existe, modificamos la posicion
                 if(index > -1){
                     that.players[index].setPosition(element.x, element.y);
+                    that.players[index].setRotation(element.rotation);
                 } else{
                     // si no, lo añadimos.
                     that.addPlayer(element);
@@ -94,6 +97,8 @@ function FirstScene(game) {
         p.preload();
         p.create(element.x, element.y);
         this.game.physics.p2.enable(p.getSprite());
+        var pantalla = p.getGame();
+        pantalla.camera.follow(p.getSprite(),Phaser.Camera.FOLLOW_LOCKON);
         this.players.push(p);
     }
     this.listener = function () {
@@ -103,36 +108,44 @@ function FirstScene(game) {
 
     this.update = function () {
 
-        //this.player.setVelocityX(0);
-        //this.player.setVelocityY(0);
-        //this.player.getSprite().body.angularVelocity = 0;
+        if(this.player != null){
+            this.player.setVelocityX(0);
+            this.player.setVelocityY(0);
+            this.player.getSprite().body.angularVelocity = 0;
 
+            var dy = this.game.input.mousePointer.y - this.player.getSprite().worldPosition.y;
+            var dx = this.game.input.mousePointer.x - this.player.getSprite().worldPosition.x;
+    
+            var angle = Math.atan2(dy, dx);
+    
+            this.player.setRotation(angle);
 
-
-        // La apunta al mouse, siempre
-        //var dy = this.game.input.mousePointer.y - this.player.getSprite().worldPosition.y;
-        //var dx = this.game.input.mousePointer.x - this.player.getSprite().worldPosition.x;
-
-        //var angle = Math.atan2(dy, dx);
-
-        //this.player.getSprite().body.rotation = angle;
+        }
+        
 
         if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
             let player_position = this.players.map(function (player) { return player.id; }).indexOf(this.myId);
+            this.player = this.players[player_position];
             this.players[player_position].setVelocityX(-200);
         }
         else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
             let player_position = this.players.map(function (player) { return player.id; }).indexOf(this.myId);
+            this.player = this.players[player_position];
             this.players[player_position].setVelocityX(200);
         }
 
         if (this.game.input.keyboard.isDown(Phaser.Keyboard.W)) {
             let player_position = this.players.map(function (player) { return player.id; }).indexOf(this.myId);
+            this.player = this.players[player_position];
             this.players[player_position].setVelocityY(-200);
         } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.S)) {
             let player_position = this.players.map(function (player) { return player.id; }).indexOf(this.myId);
+            this.player = this.players[player_position];
             this.players[player_position].setVelocityY(200);
         }
+
+
+
     }
 
 

@@ -2,6 +2,7 @@ function Player(game) {
     this.id = 0;
     this.game = game;
     this.sprite;
+    this.rotation = 90;
     this.position = {
         x: 0,
         y: 0
@@ -38,7 +39,9 @@ function Player(game) {
 
     }
     
-
+    this.getGame = function () {
+        return this.game.world;
+    }
     this.setVelocityX = function (x) {
         //velocidad igualada a 0;
         this.getSprite().body.velocity.x = x;
@@ -54,6 +57,13 @@ function Player(game) {
         this.velocity.y = y;
     }
 
+    this.setRotation = function (angle){
+        this.rotation = angle;
+        this.getSprite().body.rotation = angle;
+    }
+    this.getRotation = function (){
+        return this.rotation
+    }
     this.getVelocity = function() {
         return this.velocity;
     }
