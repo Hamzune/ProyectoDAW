@@ -1,32 +1,40 @@
 function FirstScene(game) {
 
     this.game = game;
+    this.map = {
+        portals: [{x: 500, y: 900}, {x: 1030, y: 300}, {x:2600, y:400}],
+        stars: [{x: 100,y:500},{x: 1000,y:500},{x: 4000,y:500}]
+    };
 
+    this.portals = [];
+    this.stars = [];
 
     this.preload = function () {
-        this.game.load.tilemap('desert', 'assets/maps/desert.json', null, Phaser.Tilemap.TILED_JSON);
-        this.game.load.image('tiles', 'assets/images/tmw_desert_spacing.png');
-
         this.player = new Player(this.game);
         this.player.preload();
+
+        game.load.image('star', 'assets/images/star.png');
+        game.load.image('portal', 'assets/images/bullet.png');
 
     }
 
     this.create = function () {
-        game.physics.startSystem(Phaser.Physics.ARCADE);
+        game.physics.startSystem(Phaser.Physics.P2JS);
+        game.world.setBounds(0,0,8000,1920);
         
-        map = game.add.tilemap('desert');
+        this.player.create(game.world.centerX, game.world.centerY);
 
-        map.addTilesetImage('Desert', 'tiles');
+        this.map.portals.forEach(element => {
+            this.portals.push(game.add.sprite(element.x, element.y, 'star'));
+        });
 
-        layer = map.createLayer('Ground');
+        this.map.stars.forEach(element => {
+            this.stars.push(game.add.sprite(element.x, element.y, 'portal'));
 
-        layer.resizeWorld();
+        });
 
-
-        this.player.create(100, 100);
-
-        this.game.physics.arcade.enable(this.player.getSprite());
+        game.camera.follow(this.player.getSprite());
+        this.game.physics.p2.enable(this.player.getSprite());
     }
 
     this.listener = function () {
@@ -43,12 +51,14 @@ function FirstScene(game) {
         this.player.movement();
 
         // La apunta al mouse, siempre
-        var dy = this.game.input.mousePointer.y - this.player.getSprite().y;
-        var dx = this.game.input.mousePointer.x - this.player.getSprite().x;
+        var dy = this.game.input.mousePointer.y - this.player.getSprite().worldPosition.y;
+        var dx = this.game.input.mousePointer.x - this.player.getSprite().worldPosition.x;
+
 
         var angle = Math.atan2(dy, dx);
 
-        this.player.getSprite().rotation = angle;
+    
+        this.player.getSprite().body.rotation = angle;
     }
 
     this.render = function () {

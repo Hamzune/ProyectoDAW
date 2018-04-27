@@ -10,7 +10,7 @@ function Player(game) {
         y: 0
     }
     this.life = 100;
-    this.velocity = 60;
+    this.velocity = 1000;
     //objeto Weapon
     this.weapon = null;
 
@@ -61,17 +61,17 @@ function Player(game) {
 
     this.movement = function () {
         if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
-            this.setVelocityX(-200);
+            this.setVelocityX(-this.velocity);
         }
         else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
-            this.setVelocityX(200);
+            this.setVelocityX(this.velocity);
         }
 
         if (this.game.input.keyboard.isDown(Phaser.Keyboard.W)) {
-            this.setVelocityY(-200);
+            this.setVelocityY(-this.velocity);
             
         } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.S)) {
-            this.setVelocityY(200);
+            this.setVelocityY(this.velocity);
         }
     }
 
