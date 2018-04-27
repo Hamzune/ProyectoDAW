@@ -82,11 +82,11 @@ function Player(game) {
 */
     }
     this.getPosition = function() {
-        return this.getSprite().position;
+        return this.getSprite().body;
     }
     this.setPosition = function(x,y) {
-        this.getSprite().position.x = x;
-        this.getSprite().position.y = y;
+        this.getSprite().body.x = x;
+        this.getSprite().body.y = y;
     }
     this.die = function(){
         this.getSprite().destroy();

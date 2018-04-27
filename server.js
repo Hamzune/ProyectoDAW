@@ -30,25 +30,28 @@ io.on('connection', function (socket) {
         };
         server.players.push(data);
         socket.player = data;
+
+        console.log(server.players);
         io.emit('newPlayer', data);
     });
 
     socket.on('player_position_refresh', function (data) {
-        let posicion = server.players.map(function (player) { return player.id; }).indexOf(data.id);
-        if (posicion != -1) server.players[posicion] = data;
+        let index = server.players.map(function (player) { return player.id; }).indexOf(data.id);
+        if (index != -1) server.players[index] = data;
+
+        io.emit('refresh_all_players', server.players);
+
     });
 
-    //El servidor envia a todo el mundo la posicion de todos
-    setInterval(function () {
-        socket.broadcast.emit('refresh_all_players', server.players);
-    }, 50);
-
     socket.on('disconnect', () => {
-        if (typeof socket.player.id !== undefined) {
+        if (socket.player && typeof socket.player.id !== undefined) {
+            console.log(socket.player.id);
             io.emit('remove', socket.player.id);
 
-            let posicion = server.players.map(function (player) { return player.id; }).indexOf(socket.player.id);
-            if (posicion != -1) server.players.splice(posicion, 1);
+            // Buscamos en el array de jugadores al que se acaba de desconectar y lo eliminamos
+            let index = server.players.map(function (player) { return player.id; }).indexOf(socket.player.id);
+            if (index != -1) server.players.splice(index, 1);
+
             console.log("user " + socket.player.id + " disconnected");
         }
     });

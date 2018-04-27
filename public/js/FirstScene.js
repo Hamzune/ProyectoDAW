@@ -9,12 +9,13 @@ function FirstScene(game) {
     this.players = [];
     this.client;
 
-    this.myId = null;
+    this.myId = -1;
 
     this.preload = function () {
         game.load.image('ship', 'assets/images/ship.png');
         game.load.image('star', 'assets/images/star.png');
         game.load.image('portal', 'assets/images/bullet.png');
+        game.stage.disableVisibilityChange = true;
     }
 
     this.create = function () {
@@ -39,20 +40,17 @@ function FirstScene(game) {
             this.client.createNewPlayer();
         });
 
-        //Recivir mi jugador nuevo
+        //Recibir mi jugador nuevo
         this.client.socket.on('newPlayer', function (data) {
-            let p = new Player(that.game);
-            that.myId = (that.myId == null) ? data.id : that.myId;
-            p.id = that.myId;
-            p.preload();
-            p.create(data.x, data.y);
-            that.game.physics.p2.enable(p.getSprite());
-            that.players.push(p);
+            if (that.myId == -1) {
+                that.myId = that.myId == -1 ? data.id : that.myId;
+                that.addPlayer(data);
+            }
         });
 
         //Refrescar mi posicion al servidor cada 10 milisegundos
         setInterval(function () {
-            if (that.myId != null) {
+            if (that.myId != -1) {
                 let myPosition = that.players.map(function (player) { return player.id; }).indexOf(that.myId);
                 let player = that.players[myPosition];
 
@@ -63,41 +61,41 @@ function FirstScene(game) {
                 };
                 that.client.socket.emit('player_position_refresh', new_position);
             }
-        }, 100);
-        /*
-                this.client.socket.on('movePlayer', function (data) {
-                    that.players[data.id].getSprite().body.x = data.x;
-                    that.players[data.id].getSprite().body.y = data.y;
-                });
-        */
+        }, 10);
 
         //Refrescar la posición de los demas y no la mia
         this.client.socket.on('refresh_all_players', function (data) {
-            data.forEach(function (element) {
-                if (element.id != that.myId) {
-                    console.log(element);
-                    let player_position = that.players.map(function (player) { return player.id; }).indexOf(element.id);
-                    if (player_position == -1) {
-                        var p = new Player(that.game);
-                        p.id = element.id;
-                        p.preload();
-                        p.create(element.x, element.y);
-                        that.game.physics.p2.enable(p.getSprite());
-                        that.players.push(p);
-                    } else {
-                        that.players[player_position].setPosition(element.x, element.y);
-                    }
+            data.forEach(function(element){
+                let index = that.players.map(function (player) { return player.id }).indexOf(element.id);
+                // Si ya existe, modificamos la posicion
+                if(index > -1){
+                    that.players[index].setPosition(element.x, element.y);
+                } else{
+                    // si no, lo añadimos.
+                    that.addPlayer(element);
                 }
             });
         });
 
+        // Si se ha desconectado ejecutamos el remove
         this.client.socket.on('remove', function (id) {
             let player_position = that.players.map(function (player) { return player.id; }).indexOf(id);
-            this.players[player_position].die();
-            this.players.splice(player_position, 1);
+            // Destroy al objecto player
+            that.players[player_position].die();
+            // Eliminamos el player del array de players
+            that.players.splice(player_position, 1);
+
         });
     }
 
+    this.addPlayer = function(element){
+        let p = new Player(this.game);
+        p.id = element.id;
+        p.preload();
+        p.create(element.x, element.y);
+        this.game.physics.p2.enable(p.getSprite());
+        this.players.push(p);
+    }
     this.listener = function () {
         this.game.myrenderer.changeScene(new SecondScene(this.game));
     }
