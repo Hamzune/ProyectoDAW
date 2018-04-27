@@ -1,4 +1,5 @@
 function Player(game) {
+    this.id = 0;
     this.game = game;
     this.sprite;
     this.position = {
@@ -10,7 +11,7 @@ function Player(game) {
         y: 0
     }
     this.life = 100;
-    this.velocity = 1000;
+    this.velocity = 100;
     //objeto Weapon
     this.weapon = null;
 
@@ -36,6 +37,7 @@ function Player(game) {
     this.setDamage = function () {
 
     }
+    
 
     this.setVelocityX = function (x) {
         //velocidad igualada a 0;
@@ -46,6 +48,7 @@ function Player(game) {
 
     this.setVelocityY = function (y) {
         //velocidad igualada a 0;
+
         this.getSprite().body.velocity.y = y;
 
         this.velocity.y = y;
@@ -73,8 +76,18 @@ function Player(game) {
         } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.S)) {
             this.setVelocityY(this.velocity);
         }
-    }
 
+        this.position.x = this.sprite.body.x;
+        this.position.y = this.sprite.body.y;
+
+    }
+    this.getPosition = function() {
+        return this.getSprite().position;
+    }
+    this.setPosition = function(x,y) {
+        this.getSprite().position.x = x;
+        this.getSprite().position.y = y;
+    }
     this.render = function () {
 
     }
