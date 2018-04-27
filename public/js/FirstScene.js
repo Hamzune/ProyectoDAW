@@ -45,7 +45,8 @@ function FirstScene(game) {
         this.client.socket.on('newPlayer', function (data) {
             if (that.myId == -1) {
                 that.myId = that.myId == -1 ? data.id : that.myId;
-                that.addPlayer(data);
+                that.game.camera.follow(that.addPlayer(data).getSprite(),Phaser.Camera.FOLLOW_LOCKON);
+            
             }
         });
 
@@ -97,9 +98,9 @@ function FirstScene(game) {
         p.preload();
         p.create(element.x, element.y);
         this.game.physics.p2.enable(p.getSprite());
-        var pantalla = p.getGame();
-        pantalla.camera.follow(p.getSprite(),Phaser.Camera.FOLLOW_LOCKON);
         this.players.push(p);
+
+        return p;
     }
     this.listener = function () {
         this.game.myrenderer.changeScene(new SecondScene(this.game));
