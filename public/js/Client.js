@@ -12,8 +12,8 @@ function Client(scene) {
         return p;
        
     }
-    this.askNewPlayer = function() {
-        this.socket.emit('askNewPlayer');
+    this.createNewPlayer = function(id) {
+        this.socket.emit('newPlayer',{id:id});
     }
 
     this.movedPlayer = function(player){
@@ -23,7 +23,9 @@ function Client(scene) {
         
     }
     this.socket.on('remove',function(id){
-    })
+
+    });
+
     this.KilledPlayer = function(){
 
     }

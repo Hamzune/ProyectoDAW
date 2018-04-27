@@ -63,7 +63,7 @@ function Player(game) {
     }
 
     this.movement = function () {
-        if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
+/*      if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
             this.setVelocityX(-this.velocity);
         }
         else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
@@ -79,7 +79,7 @@ function Player(game) {
 
         this.position.x = this.sprite.body.x;
         this.position.y = this.sprite.body.y;
-
+*/
     }
     this.getPosition = function() {
         return this.getSprite().position;
@@ -87,6 +87,9 @@ function Player(game) {
     this.setPosition = function(x,y) {
         this.getSprite().position.x = x;
         this.getSprite().position.y = y;
+    }
+    this.die = function(){
+        this.getSprite().destroy();
     }
     this.render = function () {
 

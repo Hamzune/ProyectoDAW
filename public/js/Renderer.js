@@ -1,6 +1,11 @@
 function Renderer(game) {
     this.game = game;
     this.scene = new FirstScene(game);
+
+    this.init = function(){
+        this.game.stage.disableVisibilityChange = false;
+    }
+
     this.preload = function () {
         this.scene.preload();
     }
