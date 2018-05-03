@@ -25,6 +25,9 @@ function Player(game) {
         //creacion de sprite player
         this.sprite = this.game.add.sprite(x, y, 'ship');
         this.sprite.anchor.set(0.5, 0.5);
+        this.game.physics.arcade.enable(this.getSprite(),true);
+
+        this.sprite.body.collideWorldBounds = true;
         //añadir arma a jugador 
         this.weapon = game.add.weapon(40, 'bullet');
         this.weapon.setBulletFrames(0, 80, true);
@@ -77,7 +80,7 @@ function Player(game) {
 
     this.setRotation = function (angle){
         this.rotation = angle;
-        this.getSprite().body.rotation = angle;
+        this.getSprite().rotation = angle;
     }
     this.getRotation = function (){
         return this.rotation
@@ -112,11 +115,11 @@ function Player(game) {
 */
     }
     this.getPosition = function() {
-        return this.getSprite().body;
+        return this.getSprite();
     }
     this.setPosition = function(x,y) {
-        this.getSprite().body.x = x;
-        this.getSprite().body.y = y;
+        this.getSprite().x = x;
+        this.getSprite().y = y;
     }
     this.die = function(){
         this.getSprite().destroy();

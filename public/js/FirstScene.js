@@ -16,7 +16,7 @@ function FirstScene(game) {
 
     this.preload = function () {
         game.load.image('ship', 'assets/images/ship.png');
-        game.load.physics('ship_physics','assets/imatges/ship-physics.json');
+        game.load.physics('ship_physics','assets/images/ship-physics.json');
         game.load.image('star', 'assets/images/star.png');
         game.load.image('portal', 'assets/images/bullet.png');
         game.load.image('bullet', 'assets/images/bullet.png');
@@ -26,7 +26,7 @@ function FirstScene(game) {
     this.create = function () {
         var that = this;
 
-        game.physics.startSystem(Phaser.Physics.P2JS);
+        game.physics.startSystem(Phaser.Physics.ARCADE);
         game.world.setBounds(0, 0, 8000, 1920);
         this.client = new Client();
 
@@ -60,7 +60,6 @@ function FirstScene(game) {
             if (that.myId != -1) {
                 let myPosition = that.players.map(function (player) { return player.id; }).indexOf(that.myId);
                 let player = that.players[myPosition];
-
                 let new_position = {
                     id: that.myId,
                     x: player.getPosition().x,
@@ -107,9 +106,8 @@ function FirstScene(game) {
         p.id = element.id;
         p.preload();
         p.create(element.x, element.y);
-        this.game.physics.p2.enable(p.getSprite(),true);
-        p.getSprite().body.clearShapes();
-        p.getSprite().body.loadPolygon('ship_physics','PhysicsKeyHere');
+        this.game.physics.arcade.enable(p.getSprite(),true);
+
         this.players.push(p);
 
         return p;
