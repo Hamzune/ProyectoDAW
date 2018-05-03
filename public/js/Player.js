@@ -12,7 +12,7 @@ function Player(game) {
         y: 0
     }
     this.life = 100;
-    this.velocity = 100;
+    this.velocity = 400;
     //objeto Weapon
     this.weapon = null;
 
@@ -25,12 +25,26 @@ function Player(game) {
         //creacion de sprite player
         this.sprite = this.game.add.sprite(x, y, 'ship');
         this.sprite.anchor.set(0.5, 0.5);
+        //añadir arma a jugador 
+        this.weapon = game.add.weapon(40, 'bullet');
+        this.weapon.setBulletFrames(0, 80, true);
+        this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+        this.weapon.bulletSpeed = 1000;
+        this.weapon.fireRate = 150;
 
+        this.weapon.bullets.setAll('scale.x', 0.5);
+        this.weapon.bullets.setAll('scale.y', 0.5);
+        
+        this.weapon.trackSprite(this.sprite, 0, 0, true);
+        
     }
     this.getSprite = function () {
         return this.sprite;
     }
 
+    this.shut = function () {
+
+    }
     this.setWeapon = function () {
 
     }
@@ -39,6 +53,10 @@ function Player(game) {
 
     }
     
+    this.fire = function() {
+        this.weapon.fire();        
+    }
+
     this.getGame = function () {
         return this.game.world;
     }

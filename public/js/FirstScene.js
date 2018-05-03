@@ -11,11 +11,14 @@ function FirstScene(game) {
 
     this.player = null;
     this.myId = -1;
+    this.fireButton = null;
+    this.isFiring = false;
 
     this.preload = function () {
         game.load.image('ship', 'assets/images/ship.png');
         game.load.image('star', 'assets/images/star.png');
         game.load.image('portal', 'assets/images/bullet.png');
+        game.load.image('bullet', 'assets/images/bullet.png');
         game.stage.disableVisibilityChange = true;
     }
 
@@ -25,6 +28,8 @@ function FirstScene(game) {
         game.physics.startSystem(Phaser.Physics.P2JS);
         game.world.setBounds(0, 0, 8000, 1920);
         this.client = new Client();
+
+        this.fireButton = this.game.input.mousePointer;
 
         //Pedir el mapa
         this.client.getMap().then((map) => {
@@ -45,8 +50,7 @@ function FirstScene(game) {
         this.client.socket.on('newPlayer', function (data) {
             if (that.myId == -1) {
                 that.myId = that.myId == -1 ? data.id : that.myId;
-                that.game.camera.follow(that.addPlayer(data).getSprite(),Phaser.Camera.FOLLOW_LOCKON);
-            
+                that.game.camera.follow(that.addPlayer(data).getSprite(), Phaser.Camera.FOLLOW_LOCKON);
             }
         });
 
@@ -60,21 +64,26 @@ function FirstScene(game) {
                     id: that.myId,
                     x: player.getPosition().x,
                     y: player.getPosition().y,
-                    rotation: player.getRotation()
+                    fire: that.isFiring,
+                    rotation: player.getRotation(),      
                 };
+                
                 that.client.socket.emit('player_position_refresh', new_position);
             }
         }, 10);
 
         //Refrescar la posición de los demas y no la mia
         this.client.socket.on('refresh_all_players', function (data) {
-            data.forEach(function(element){
+            data.forEach(function (element) {
                 let index = that.players.map(function (player) { return player.id }).indexOf(element.id);
                 // Si ya existe, modificamos la posicion
-                if(index > -1){
+                if (index > -1) {
                     that.players[index].setPosition(element.x, element.y);
                     that.players[index].setRotation(element.rotation);
-                } else{
+                    if (element.fire) {
+                        that.players[index].fire();
+                    }
+                } else {
                     // si no, lo añadimos.
                     that.addPlayer(element);
                 }
@@ -92,7 +101,7 @@ function FirstScene(game) {
         });
     }
 
-    this.addPlayer = function(element){
+    this.addPlayer = function (element) {
         let p = new Player(this.game);
         p.id = element.id;
         p.preload();
@@ -102,50 +111,46 @@ function FirstScene(game) {
 
         return p;
     }
+
     this.listener = function () {
         this.game.myrenderer.changeScene(new SecondScene(this.game));
     }
 
-
     this.update = function () {
-
-        if(this.player != null){
+        let player_position = this.players.map(function (player) { return player.id; }).indexOf(this.myId);
+        this.player = this.players[player_position];
+        if (this.player != null) {
             this.player.setVelocityX(0);
             this.player.setVelocityY(0);
             this.player.getSprite().body.angularVelocity = 0;
 
             var dy = this.game.input.mousePointer.y - this.player.getSprite().worldPosition.y;
             var dx = this.game.input.mousePointer.x - this.player.getSprite().worldPosition.x;
-    
-            var angle = Math.atan2(dy, dx);
-    
-            this.player.setRotation(angle);
 
+            var angle = Math.atan2(dy, dx);
+           
+            this.player.setRotation(angle);
         }
-        
+
 
         if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
-            let player_position = this.players.map(function (player) { return player.id; }).indexOf(this.myId);
-            this.player = this.players[player_position];
-            this.players[player_position].setVelocityX(-200);
-        }
-        else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
-            let player_position = this.players.map(function (player) { return player.id; }).indexOf(this.myId);
-            this.player = this.players[player_position];
-            this.players[player_position].setVelocityX(200);
+            this.player.setVelocityX(-this.players[player_position].getVelocity());
+        } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+            this.player.setVelocityX(this.players[player_position].getVelocity());
         }
 
         if (this.game.input.keyboard.isDown(Phaser.Keyboard.W)) {
-            let player_position = this.players.map(function (player) { return player.id; }).indexOf(this.myId);
-            this.player = this.players[player_position];
-            this.players[player_position].setVelocityY(-200);
+            this.player.setVelocityY(-this.players[player_position].getVelocity());
         } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.S)) {
-            let player_position = this.players.map(function (player) { return player.id; }).indexOf(this.myId);
-            this.player = this.players[player_position];
-            this.players[player_position].setVelocityY(200);
+            this.player.setVelocityY(this.players[player_position].getVelocity());
         }
 
+        if (this.fireButton.isDown) {
+            this.isFiring = true;
 
+        } else {
+            this.isFiring = false;
+        }
 
     }
 
