@@ -16,6 +16,7 @@ function FirstScene(game) {
 
     this.preload = function () {
         game.load.image('ship', 'assets/images/ship.png');
+        game.load.physics('ship_physics','assets/imatges/ship-physics.json');
         game.load.image('star', 'assets/images/star.png');
         game.load.image('portal', 'assets/images/bullet.png');
         game.load.image('bullet', 'assets/images/bullet.png');
@@ -106,7 +107,9 @@ function FirstScene(game) {
         p.id = element.id;
         p.preload();
         p.create(element.x, element.y);
-        this.game.physics.p2.enable(p.getSprite());
+        this.game.physics.p2.enable(p.getSprite(),true);
+        p.getSprite().body.clearShapes();
+        p.getSprite().body.loadPolygon('ship_physics','PhysicsKeyHere');
         this.players.push(p);
 
         return p;
@@ -151,6 +154,7 @@ function FirstScene(game) {
         } else {
             this.isFiring = false;
         }
+
 
     }
 

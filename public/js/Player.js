@@ -82,10 +82,12 @@ function Player(game) {
     this.getRotation = function (){
         return this.rotation
     }
-    this.getVelocity = function() {
+    this.getVelocity = function () {
         return this.velocity;
     }
-
+    this.setVelocity = function (vel){
+        this.velocity = vel;
+    }
     this.setAngularVelocity = function (vel) {
         this.getSprite().body.angularVelocity = vel;
     }

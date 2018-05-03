@@ -31,7 +31,6 @@ io.on('connection', function (socket) {
         server.players.push(data);
         socket.player = data;
 
-        console.log(server.players);
         io.emit('newPlayer', data);
     });
 
