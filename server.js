@@ -41,7 +41,6 @@ io.on('connection', function (socket) {
         };
         server.players.push(data);
         socket.player = data;
-
         io.emit('newPlayer', data);
     });
 
@@ -53,8 +52,9 @@ io.on('connection', function (socket) {
 
     });
 
+
     socket.on('remove_player', (id) => {
-        console.log(id);
+
         io.emit('remove', id);
 
         // Buscamos en el array de jugadores al que se acaba de desconectar y lo eliminamos
@@ -65,10 +65,10 @@ io.on('connection', function (socket) {
 
     });
 
-    /*socket.on('set_damage', (id) => {
+    socket.on('set_damage', (id) => {
         console.log(server.players);
         io.emit('damage', id);
-    });*/
+    });
 
 
     socket.on('disconnect', () => {
@@ -88,9 +88,12 @@ io.on('connection', function (socket) {
     socket.on('error', function (err) { 
         console.log("Socket.IO Error"); 
         console.log(err.stack); // this is changed from your code in last comment
-     });
+    });
 });
 
+reenviar = function(){
+    io.emit('refresh_all_players', server.players);
+}
 
 server.listen(3002, function () {
     console.log('Listening on ' + server.address().port);

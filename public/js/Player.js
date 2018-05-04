@@ -11,7 +11,7 @@ function Player(game) {
         x: 0,
         y: 0
     }
-    this.life = 0;
+    this.life = 100;
     this.velocity = 700;
     //objeto Weapon
     this.weapon = null;
@@ -25,6 +25,7 @@ function Player(game) {
         //creacion de sprite player
         this.sprite = this.game.add.sprite(x, y, 'ship');
         this.sprite.anchor.set(0.5, 0.5);
+        this.sprite.id = this.id;
         this.game.physics.arcade.enable(this.getSprite(),true);
 
         this.sprite.body.collideWorldBounds = true;
@@ -41,16 +42,12 @@ function Player(game) {
         
         this.weapon.trackSprite(this.sprite, 40, 0, true);
 
-        this.life = 100;
         
     }
     this.getSprite = function () {
         return this.sprite;
     }
 
-    this.shut = function () {
-
-    }
     this.setWeapon = function () {
 
     }
@@ -62,7 +59,17 @@ function Player(game) {
     this.getLife = function() {
         return this.life;
     }
-
+    this.getInformation = function(id, fire){
+        let new_position = {
+            id: id,
+            x: this.getPosition().x,
+            y: this.getPosition().y,
+            fire: fire,
+            rotation: parseFloat(this.getRotation()).toFixed(5),
+            life: this.life
+        };
+        return new_position;
+    }
     this.setLife = function (life){
         this.life = life;
     }

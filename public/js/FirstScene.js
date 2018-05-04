@@ -71,9 +71,9 @@ function FirstScene(game) {
                 //  The Text is positioned at 0, 100
                 let myPosition = that.getIndex(that.myId);
 
-                that.text = game.add.text(0, 0, "Life:" + that.players[myPosition].life, style);
+                that.text = game.add.text(10, 10, "Life:" + that.players[myPosition].life, style);
                 that.text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
-                //that.text.fixedToCamera = true;
+                that.text.fixedToCamera = true;
 
                 //  We'll set the bounds to be from x0, y100 and be 800px wide by 100px high
             }
@@ -85,19 +85,13 @@ function FirstScene(game) {
                 let myPosition = that.getIndex(that.myId);
                 if (myPosition > -1) {
                     let player = that.players[myPosition];
-                    let new_position = {
-                        id: that.myId,
-                        x: player.getPosition().x,
-                        y: player.getPosition().y,
-                        fire: that.isFiring,
-                        rotation: parseFloat(player.getRotation()).toFixed(5),
-                        life: player.getLife()
-                    };
+
+                    let new_position = player.getInformation(that.myId,that.isFiring);
 
                     that.client.socket.emit('player_position_refresh', new_position);
                 }
             }
-        }, 30);
+        }, 10);
 
         //Refrescar la posición de los demas y no la mia
         this.client.socket.on('refresh_all_players', function (data) {
@@ -127,14 +121,14 @@ function FirstScene(game) {
             that.players.splice(player_position, 1);
         });
 
-        /*this.client.socket.on('damage', function (id) {
+        this.client.socket.on('damage', function (id) {
             let player_position = that.getIndex(id);
             that.players[player_position].setDamage(10);
 
             if (that.players[player_position].id == that.myId) {
                 that.text.setText("Life:" + that.players[player_position].getLife());
             }
-        });*/
+        });
 
 
     }
@@ -194,24 +188,46 @@ function FirstScene(game) {
             if (this.fireButton.isDown) {
                 this.isFiring = true;
                 let bullets = this.player.getWeapon().bullets.children;
+                
+                //console.log(this.player.getWeapon().bullets);
+                /*
                 bullets.forEach(function (bullet) {
                     let pos = bullet.body.position;
                     pos.height = 23.5;
                     pos.width = 23.5;
-                    for (let i = 0, ic = that.players.length; i < ic; i++) {
-                        if (that.collisionHandler(pos, that.players[i].getSprite()) && that.players[i].id != that.myId) {
-                            that.setDamage(that.players[i].id);
-                        }
+                   
+                });*/
+                for (let i = 0, ic = that.players.length; i < ic; i++) {
+                    if (that.players[i].id != that.myId) {
+                        //that.setDamage(that.players[i].id);
+
+                        //this.game.physics.arcade.collide(bullets, that.players[i].getSprite());
+                        this.game.physics.arcade.overlap(bullets,  that.players[i].getSprite(), collision , null, this);
                     }
-                });
+                }
+                
             } else {
                 this.isFiring = false;
             }
         }
     }
 
+    function collision (bullet, player) {
+
+        //  When a bullet hits an alien we kill them both
+        bullet.destroy();
+        //console.log(player);
+        this.setDamage(player.id);
+    
+        //  Increase the score
+      
+    
+        //  And create an explosion :)
+      
+    
+    }
     this.setDamage = function (id) {
-        /*console.log(this.players);
+        //console.log(this.players);
 
         let index = this.getIndex(id);
         if ((this.players[index].getLife()) == 0) {
@@ -219,7 +235,7 @@ function FirstScene(game) {
 
         } else {
             this.client.socket.emit('set_damage', id);
-    }*/
+        }
     }
     this.collisionHandler = function (o1, o2) {
         return (o1.x <= o2.position.x + o2.getBounds().width / 2 &&
