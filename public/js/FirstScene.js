@@ -14,18 +14,30 @@ function FirstScene(game) {
     this.fireButton = null;
     this.isFiring = false;
 
+    this.enemies = {};
+
+    this.text = null;
+
+
     this.preload = function () {
         game.load.image('ship', 'assets/images/ship.png');
-        game.load.physics('ship_physics','assets/images/ship-physics.json');
-        game.load.image('star', 'assets/images/star.png');
+        game.load.image('star', 'assets/images/bullet.png');
         game.load.image('portal', 'assets/images/bullet.png');
         game.load.image('bullet', 'assets/images/bullet.png');
         game.stage.disableVisibilityChange = true;
     }
-
+    this.getIndex = function (id) {
+        for (let i = 0, ic = this.players.length; i < ic; i++) {
+            if (this.players[i].id == id) {
+                return i;
+            }
+        }
+    }
     this.create = function () {
         var that = this;
-
+        this.grup = this.game.add.group();
+        this.grup.enableBody = true;
+        this.grup.physicsBodyType = Phaser.Physics.ARCADE;
         game.physics.startSystem(Phaser.Physics.ARCADE);
         game.world.setBounds(0, 0, 8000, 1920);
         this.client = new Client();
@@ -51,62 +63,92 @@ function FirstScene(game) {
         this.client.socket.on('newPlayer', function (data) {
             if (that.myId == -1) {
                 that.myId = that.myId == -1 ? data.id : that.myId;
-                that.game.camera.follow(that.addPlayer(data).getSprite(), Phaser.Camera.FOLLOW_LOCKON);
+
+                that.game.camera.follow(that.addPlayer(data, false).getSprite(), Phaser.Camera.FOLLOW_LOCKON);
+
+                var style = { font: "bold 32px Arial", fill: "#fff", boundsAlignH: "center", boundsAlignV: "middle" };
+
+                //  The Text is positioned at 0, 100
+                let myPosition = that.getIndex(that.myId);
+
+                that.text = game.add.text(0, 0, "Life:" + that.players[myPosition].life, style);
+                that.text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
+                //that.text.fixedToCamera = true;
+
+                //  We'll set the bounds to be from x0, y100 and be 800px wide by 100px high
             }
         });
 
         //Refrescar mi posicion al servidor cada 10 milisegundos
         setInterval(function () {
             if (that.myId != -1) {
-                let myPosition = that.players.map(function (player) { return player.id; }).indexOf(that.myId);
-                let player = that.players[myPosition];
-                let new_position = {
-                    id: that.myId,
-                    x: player.getPosition().x,
-                    y: player.getPosition().y,
-                    fire: that.isFiring,
-                    rotation: player.getRotation(),      
-                };
-                
-                that.client.socket.emit('player_position_refresh', new_position);
+                let myPosition = that.getIndex(that.myId);
+                if (myPosition > -1) {
+                    let player = that.players[myPosition];
+                    let new_position = {
+                        id: that.myId,
+                        x: player.getPosition().x,
+                        y: player.getPosition().y,
+                        fire: that.isFiring,
+                        rotation: parseFloat(player.getRotation()).toFixed(5),
+                        life: player.getLife()
+                    };
+
+                    that.client.socket.emit('player_position_refresh', new_position);
+                }
             }
-        }, 10);
+        }, 30);
 
         //Refrescar la posición de los demas y no la mia
         this.client.socket.on('refresh_all_players', function (data) {
             data.forEach(function (element) {
-                let index = that.players.map(function (player) { return player.id }).indexOf(element.id);
+                let index = that.getIndex(element.id);
                 // Si ya existe, modificamos la posicion
                 if (index > -1) {
                     that.players[index].setPosition(element.x, element.y);
                     that.players[index].setRotation(element.rotation);
+
                     if (element.fire) {
                         that.players[index].fire();
                     }
                 } else {
                     // si no, lo añadimos.
-                    that.addPlayer(element);
+                    let p = that.addPlayer(element, true);
                 }
             });
         });
 
         // Si se ha desconectado ejecutamos el remove
         this.client.socket.on('remove', function (id) {
-            let player_position = that.players.map(function (player) { return player.id; }).indexOf(id);
+            let player_position = that.getIndex(id);
             // Destroy al objecto player
             that.players[player_position].die();
             // Eliminamos el player del array de players
             that.players.splice(player_position, 1);
-
         });
+
+        /*this.client.socket.on('damage', function (id) {
+            let player_position = that.getIndex(id);
+            that.players[player_position].setDamage(10);
+
+            if (that.players[player_position].id == that.myId) {
+                that.text.setText("Life:" + that.players[player_position].getLife());
+            }
+        });*/
+
+
     }
 
-    this.addPlayer = function (element) {
+    this.addPlayer = function (element, enemy) {
         let p = new Player(this.game);
         p.id = element.id;
+
         p.preload();
         p.create(element.x, element.y);
-        this.game.physics.arcade.enable(p.getSprite(),true);
+        if (enemy) {
+            p.setTint(0xff5100);
+        }
+        this.game.physics.arcade.enable(p.getSprite());
 
         this.players.push(p);
 
@@ -118,44 +160,74 @@ function FirstScene(game) {
     }
 
     this.update = function () {
-        let player_position = this.players.map(function (player) { return player.id; }).indexOf(this.myId);
-        this.player = this.players[player_position];
-        if (this.player != null) {
-            this.player.setVelocityX(0);
-            this.player.setVelocityY(0);
-            this.player.getSprite().body.angularVelocity = 0;
+        let player_position = this.getIndex(this.myId);
+        if (player_position > -1) {
+            this.player = this.players[player_position];
+            if (this.player != null) {
+                this.player.setVelocityX(0);
+                this.player.setVelocityY(0);
 
-            var dy = this.game.input.mousePointer.y - this.player.getSprite().worldPosition.y;
-            var dx = this.game.input.mousePointer.x - this.player.getSprite().worldPosition.x;
+                var dy = this.game.input.mousePointer.y - this.player.getSprite().worldPosition.y;
+                var dx = this.game.input.mousePointer.x - this.player.getSprite().worldPosition.x;
 
-            var angle = Math.atan2(dy, dx);
-           
-            this.player.setRotation(angle);
+                var angle = Math.atan2(dy, dx);
+
+                this.player.setRotation(angle);
+
+                this.weapon = this.player.getWeapon();
+            }
+
+
+            if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
+                this.player.setVelocityX(-this.players[player_position].getVelocity());
+            } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+                this.player.setVelocityX(this.players[player_position].getVelocity());
+            }
+
+            if (this.game.input.keyboard.isDown(Phaser.Keyboard.W)) {
+                this.player.setVelocityY(-this.players[player_position].getVelocity());
+            } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.S)) {
+                this.player.setVelocityY(this.players[player_position].getVelocity());
+            }
+            var that = this;
+
+            if (this.fireButton.isDown) {
+                this.isFiring = true;
+                let bullets = this.player.getWeapon().bullets.children;
+                bullets.forEach(function (bullet) {
+                    let pos = bullet.body.position;
+                    pos.height = 23.5;
+                    pos.width = 23.5;
+                    for (let i = 0, ic = that.players.length; i < ic; i++) {
+                        if (that.collisionHandler(pos, that.players[i].getSprite()) && that.players[i].id != that.myId) {
+                            that.setDamage(that.players[i].id);
+                        }
+                    }
+                });
+            } else {
+                this.isFiring = false;
+            }
         }
-
-
-        if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
-            this.player.setVelocityX(-this.players[player_position].getVelocity());
-        } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
-            this.player.setVelocityX(this.players[player_position].getVelocity());
-        }
-
-        if (this.game.input.keyboard.isDown(Phaser.Keyboard.W)) {
-            this.player.setVelocityY(-this.players[player_position].getVelocity());
-        } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.S)) {
-            this.player.setVelocityY(this.players[player_position].getVelocity());
-        }
-
-        if (this.fireButton.isDown) {
-            this.isFiring = true;
-
-        } else {
-            this.isFiring = false;
-        }
-
-
     }
 
+    this.setDamage = function (id) {
+        /*console.log(this.players);
+
+        let index = this.getIndex(id);
+        if ((this.players[index].getLife()) == 0) {
+            this.client.socket.emit('remove_player', id);
+
+        } else {
+            this.client.socket.emit('set_damage', id);
+    }*/
+    }
+    this.collisionHandler = function (o1, o2) {
+        return (o1.x <= o2.position.x + o2.getBounds().width / 2 &&
+            o1.y <= o2.position.y + o2.getBounds().height / 2 &&
+            o1.x + o1.width >= o2.position.x &&
+            o1.y + o1.height >= o2.position.y);
+
+    }
 
     this.render = function () {
 
@@ -163,5 +235,10 @@ function FirstScene(game) {
 
     this.stop = function () {
         this.game.world.removeAll();
+    }
+
+    this.hitEnemy = function (player, enemies) {
+
+        console.log("Hit");
     }
 }

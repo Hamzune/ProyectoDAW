@@ -18,15 +18,26 @@ var map = {
 
 server.players = [];
 
+
+function getIndex(id) {
+    for (let i = 0, ic = server.players.length; i < ic; i++) {
+        if (server.players[i].id == id) {
+            return i;
+        }
+    }
+}
+server.id = 0;
+
 io.on('connection', function (socket) {
 
     io.emit('map', map);
 
     socket.on('newPlayer', function () {
         let data = {
-            id: uniqid(),
+            id: server.id++,
             x: Math.random() * 1920,
             y: Math.random() * 900,
+
         };
         server.players.push(data);
         socket.player = data;
@@ -35,27 +46,52 @@ io.on('connection', function (socket) {
     });
 
     socket.on('player_position_refresh', function (data) {
-        let index = server.players.map(function (player) { return player.id; }).indexOf(data.id);
-        if (index != -1) server.players[index] = data;
+        let index = getIndex(data.id);
+        if (index > -1) server.players[index] = data;
 
         io.emit('refresh_all_players', server.players);
 
     });
 
+    socket.on('remove_player', (id) => {
+        console.log(id);
+        io.emit('remove', id);
+
+        // Buscamos en el array de jugadores al que se acaba de desconectar y lo eliminamos
+        let index = getIndex(id);
+        if (index > -1) server.players.splice(index, 1);
+
+        console.log("user " + id + " removed");
+
+    });
+
+    /*socket.on('set_damage', (id) => {
+        console.log(server.players);
+        io.emit('damage', id);
+    });*/
+
+
     socket.on('disconnect', () => {
         if (socket.player && typeof socket.player.id !== undefined) {
-            console.log(socket.player.id);
-            io.emit('remove', socket.player.id);
-
             // Buscamos en el array de jugadores al que se acaba de desconectar y lo eliminamos
-            let index = server.players.map(function (player) { return player.id; }).indexOf(socket.player.id);
-            if (index != -1) server.players.splice(index, 1);
-
+            let index = getIndex(socket.player.id);
+            if (index > -1) {
+                if (server.players[index].life > 0) {
+                    io.emit('remove', socket.player.id);
+                    if (index > -1) server.players.splice(index, 1);
+                }
+            }
             console.log("user " + socket.player.id + " disconnected");
         }
     });
+
+    socket.on('error', function (err) { 
+        console.log("Socket.IO Error"); 
+        console.log(err.stack); // this is changed from your code in last comment
+     });
 });
 
-server.listen(3000, function () {
+
+server.listen(3002, function () {
     console.log('Listening on ' + server.address().port);
 });

@@ -4,15 +4,15 @@ function Player(game) {
     this.sprite;
     this.rotation = 90;
     this.position = {
-        x: 0,
-        y: 0
+        x: 100,
+        y: 100
     }
     this.size = {
         x: 0,
         y: 0
     }
-    this.life = 100;
-    this.velocity = 400;
+    this.life = 0;
+    this.velocity = 700;
     //objeto Weapon
     this.weapon = null;
 
@@ -28,6 +28,7 @@ function Player(game) {
         this.game.physics.arcade.enable(this.getSprite(),true);
 
         this.sprite.body.collideWorldBounds = true;
+
         //añadir arma a jugador 
         this.weapon = game.add.weapon(40, 'bullet');
         this.weapon.setBulletFrames(0, 80, true);
@@ -38,7 +39,9 @@ function Player(game) {
         this.weapon.bullets.setAll('scale.x', 0.5);
         this.weapon.bullets.setAll('scale.y', 0.5);
         
-        this.weapon.trackSprite(this.sprite, 0, 0, true);
+        this.weapon.trackSprite(this.sprite, 40, 0, true);
+
+        this.life = 100;
         
     }
     this.getSprite = function () {
@@ -52,8 +55,16 @@ function Player(game) {
 
     }
 
-    this.setDamage = function () {
+    this.setDamage = function (damage) {
+        this.setLife(this.life-damage);
+    }
 
+    this.getLife = function() {
+        return this.life;
+    }
+
+    this.setLife = function (life){
+        this.life = life;
     }
     
     this.fire = function() {
@@ -95,6 +106,10 @@ function Player(game) {
         this.getSprite().body.angularVelocity = vel;
     }
 
+    this.setTint = function(color){
+        this.getSprite().tint = color;
+    }
+
     this.movement = function () {
 /*      if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
             this.setVelocityX(-this.velocity);
@@ -122,9 +137,12 @@ function Player(game) {
         this.getSprite().y = y;
     }
     this.die = function(){
-        this.getSprite().destroy();
+        this.getSprite().kill();
     }
     this.render = function () {
 
+    }
+    this.getWeapon = function () {
+        return this.weapon;
     }
 }
