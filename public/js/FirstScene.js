@@ -25,6 +25,7 @@ function FirstScene(game) {
         game.load.image('star', 'assets/images/star.png');
         game.load.image('portal', 'assets/images/upgrade.png');
         game.load.image('bullet', 'assets/images/bullet.png');
+        game.load.image('skull', 'assets/images/skull.png');
         game.stage.disableVisibilityChange = true;
     }
     this.getIndex = function (id) {
@@ -211,6 +212,9 @@ function FirstScene(game) {
 
     this.teleport = function(player, portal){
         let next = parseInt(Math.random() * this.portals.length);
+        while(portal.x == this.portals[next].x && this.portals[next].y == portal.y){
+            next = parseInt(Math.random() * this.portals.length);
+        }
         this.player.getSprite().x = this.portals[next].x + 120;
         this.player.getSprite().y = this.portals[next].y + 120;
     }

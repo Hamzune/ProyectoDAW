@@ -17,17 +17,19 @@ function Player(game) {
     this.weapon = null;
 
     this.preload = function () {
-        this.game.load.image('ship', 'assets/images/ship.png',64,64);
+
     }
 
     this.create = function (x, y) {
+
         //creacion de sprite player
         this.sprite = this.game.add.sprite(x, y, 'ship');
         this.sprite.anchor.set(0.5, 0.5);
         this.sprite.id = this.id;
         this.game.physics.arcade.enable(this.getSprite(),true);
+
         this.sprite.body.collideWorldBounds = true;
-        
+
         //añadir arma a jugador 
         this.weapon = game.add.weapon(40, 'bullet');
         this.weapon.setBulletFrames(0, 80, true);
@@ -35,10 +37,11 @@ function Player(game) {
         this.weapon.bulletSpeed = 1000;
         this.weapon.fireRate = 150;
 
-        this.weapon.bullets.setAll('scale.x', 1);
-        this.weapon.bullets.setAll('scale.y', 1);
+        this.weapon.bullets.setAll('scale.x', 2);
+        this.weapon.bullets.setAll('scale.y', 2);
         
         this.weapon.trackSprite(this.sprite, 40, 0, true);
+
         
     }
     this.getSprite = function () {
@@ -141,7 +144,12 @@ function Player(game) {
         this.getSprite().y = y;
     }
     this.die = function(){
+        let x = this.getPosition().x;
+        let y = this.getPosition().y;
+        
         this.getSprite().kill();
+        this.sprite = this.game.add.sprite(x, y, 'skull');
+        this.sprite.anchor.set(0.5, 0.5);
     }
     this.render = function () {
 
