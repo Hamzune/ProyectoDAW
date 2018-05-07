@@ -18,11 +18,12 @@ function FirstScene(game) {
 
     this.text = null;
 
+    this.bullets;
 
     this.preload = function () {
         game.load.image('ship', 'assets/images/ship.png');
-        game.load.image('star', 'assets/images/bullet.png');
-        game.load.image('portal', 'assets/images/bullet.png');
+        game.load.image('star', 'assets/images/star.png');
+        game.load.image('portal', 'assets/images/upgrade.png');
         game.load.image('bullet', 'assets/images/bullet.png');
         game.stage.disableVisibilityChange = true;
     }
@@ -91,7 +92,7 @@ function FirstScene(game) {
                     that.client.socket.emit('player_position_refresh', new_position);
                 }
             }
-        }, 10);
+        }, 16);
 
         //Refrescar la posición de los demas y no la mia
         this.client.socket.on('refresh_all_players', function (data) {
@@ -142,7 +143,7 @@ function FirstScene(game) {
         if (enemy) {
             p.setTint(0xff5100);
         }
-        this.game.physics.arcade.enable(p.getSprite());
+        this.game.physics.arcade.enable(p.getSprite(),true);
 
         this.players.push(p);
 
@@ -185,46 +186,39 @@ function FirstScene(game) {
             }
             var that = this;
 
+            this.bullets = this.player.getWeapon().bullets.children;
+
             if (this.fireButton.isDown) {
                 this.isFiring = true;
-                let bullets = this.player.getWeapon().bullets.children;
                 
-                //console.log(this.player.getWeapon().bullets);
-                /*
-                bullets.forEach(function (bullet) {
-                    let pos = bullet.body.position;
-                    pos.height = 23.5;
-                    pos.width = 23.5;
-                   
-                });*/
-                for (let i = 0, ic = that.players.length; i < ic; i++) {
-                    if (that.players[i].id != that.myId) {
-                        //that.setDamage(that.players[i].id);
 
-                        //this.game.physics.arcade.collide(bullets, that.players[i].getSprite());
-                        this.game.physics.arcade.overlap(bullets,  that.players[i].getSprite(), collision , null, this);
-                    }
-                }
-                
             } else {
                 this.isFiring = false;
             }
+
+            for (let i = 0, ic = that.players.length; i < ic; i++) {
+                if (that.players[i].id != that.myId) {
+
+                    //this.game.physics.arcade.collide(this.bullets, that.players[i].getSprite());
+                    this.game.physics.arcade.overlap(this.bullets,  that.players[i].getSprite(), this.collision , null, this);
+                }
+            }
+            
         }
     }
 
-    function collision (bullet, player) {
+    this.collision = function (bullet, player) {
 
         //  When a bullet hits an alien we kill them both
+
         bullet.destroy();
-        //console.log(player);
+
         this.setDamage(player.id);
-    
+
         //  Increase the score
       
-    
         //  And create an explosion :)
       
-    
     }
     this.setDamage = function (id) {
         //console.log(this.players);
@@ -237,16 +231,14 @@ function FirstScene(game) {
             this.client.socket.emit('set_damage', id);
         }
     }
-    this.collisionHandler = function (o1, o2) {
-        return (o1.x <= o2.position.x + o2.getBounds().width / 2 &&
-            o1.y <= o2.position.y + o2.getBounds().height / 2 &&
-            o1.x + o1.width >= o2.position.x &&
-            o1.y + o1.height >= o2.position.y);
-
-    }
 
     this.render = function () {
-
+        /*if(this.player != null){
+            this.game.debug.body(this.player.getSprite());
+            
+        }*/   
+        this.game.debug.text('render FPS: ' +this.game.time.fps, 2, 14,'white');
+        
     }
 
     this.stop = function () {
@@ -257,4 +249,5 @@ function FirstScene(game) {
 
         console.log("Hit");
     }
+    
 }

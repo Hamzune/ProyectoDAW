@@ -66,7 +66,6 @@ io.on('connection', function (socket) {
     });
 
     socket.on('set_damage', (id) => {
-        console.log(server.players);
         io.emit('damage', id);
     });
 

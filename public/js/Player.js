@@ -37,8 +37,8 @@ function Player(game) {
         this.weapon.bulletSpeed = 1000;
         this.weapon.fireRate = 150;
 
-        this.weapon.bullets.setAll('scale.x', 0.5);
-        this.weapon.bullets.setAll('scale.y', 0.5);
+        this.weapon.bullets.setAll('scale.x', 2);
+        this.weapon.bullets.setAll('scale.y', 2);
         
         this.weapon.trackSprite(this.sprite, 40, 0, true);
 
