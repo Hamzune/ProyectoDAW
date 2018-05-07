@@ -35,25 +35,29 @@ function FirstScene(game) {
         }
     }
     this.create = function () {
-        var that = this;
+        this.client = new Client();
+        this.game.time.advancedTiming = true;
         this.grup = this.game.add.group();
         this.grup.enableBody = true;
         this.grup.physicsBodyType = Phaser.Physics.ARCADE;
         game.physics.startSystem(Phaser.Physics.ARCADE);
         game.world.setBounds(0, 0, 8000, 1920);
-        this.client = new Client();
 
         this.fireButton = this.game.input.mousePointer;
 
         //Pedir el mapa
+        var that = this;
         this.client.getMap().then((map) => {
             that.map = map;
             that.map.portals.forEach(element => {
-                that.portals.push(game.add.sprite(element.x, element.y, 'star'));
+                let sprite = game.add.sprite(element.x, element.y, 'portal');
+                that.game.physics.arcade.enable(sprite, true);
+                that.portals.push(sprite);
             });
 
             that.map.stars.forEach(element => {
-                that.stars.push(game.add.sprite(element.x, element.y, 'portal'));
+                let sprite = game.add.sprite(element.x, element.y, 'star');
+                that.stars.push(sprite);
             });
 
             //Pedir un jugador al servidor
@@ -75,8 +79,6 @@ function FirstScene(game) {
                 that.text = game.add.text(10, 10, "Life:" + that.players[myPosition].life, style);
                 that.text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
                 that.text.fixedToCamera = true;
-
-                //  We'll set the bounds to be from x0, y100 and be 800px wide by 100px high
             }
         });
 
@@ -87,7 +89,7 @@ function FirstScene(game) {
                 if (myPosition > -1) {
                     let player = that.players[myPosition];
 
-                    let new_position = player.getInformation(that.myId,that.isFiring);
+                    let new_position = player.getInformation(that.myId, that.isFiring);
 
                     that.client.socket.emit('player_position_refresh', new_position);
                 }
@@ -143,7 +145,7 @@ function FirstScene(game) {
         if (enemy) {
             p.setTint(0xff5100);
         }
-        this.game.physics.arcade.enable(p.getSprite(),true);
+        this.game.physics.arcade.enable(p.getSprite(), true);
 
         this.players.push(p);
 
@@ -190,64 +192,54 @@ function FirstScene(game) {
 
             if (this.fireButton.isDown) {
                 this.isFiring = true;
-                
-
             } else {
                 this.isFiring = false;
             }
 
             for (let i = 0, ic = that.players.length; i < ic; i++) {
                 if (that.players[i].id != that.myId) {
-
                     //this.game.physics.arcade.collide(this.bullets, that.players[i].getSprite());
-                    this.game.physics.arcade.overlap(this.bullets,  that.players[i].getSprite(), this.collision , null, this);
+                    this.game.physics.arcade.overlap(this.bullets, that.players[i].getSprite(), this.collision, null, this);
                 }
             }
-            
+
+            for (let i = 0, ic = this.portals.length; i < ic; i++) {
+                this.game.physics.arcade.overlap(this.player.getSprite(), this.portals[i], this.teleport, null, this);
+            }
         }
     }
 
-    this.collision = function (bullet, player) {
-
-        //  When a bullet hits an alien we kill them both
-
-        bullet.destroy();
-
-        this.setDamage(player.id);
-
-        //  Increase the score
-      
-        //  And create an explosion :)
-      
+    this.teleport = function(player, portal){
+        let next = parseInt(Math.random() * this.portals.length);
+        this.player.getSprite().x = this.portals[next].x + 120;
+        this.player.getSprite().y = this.portals[next].y + 120;
     }
+
+    this.collision = function (bullet, player) {
+        bullet.destroy();
+        this.setDamage(player.id);
+    }
+
     this.setDamage = function (id) {
-        //console.log(this.players);
-
         let index = this.getIndex(id);
-        if ((this.players[index].getLife()) == 0) {
-            this.client.socket.emit('remove_player', id);
+        if ((this.players[index].getLife()) <= 10) {
 
+            this.client.socket.emit('remove_player', id);
         } else {
             this.client.socket.emit('set_damage', id);
         }
     }
 
     this.render = function () {
-        /*if(this.player != null){
-            this.game.debug.body(this.player.getSprite());
-            
-        }*/   
-        this.game.debug.text('render FPS: ' +this.game.time.fps, 2, 14,'white');
-        
+        if (this.player != null) {
+            //this.game.debug.body(this.player.getSprite());
+
+        }
+        this.game.debug.text('render FPS: ' + this.game.time.fps, 2, 150, 'white');
+
     }
 
     this.stop = function () {
         this.game.world.removeAll();
     }
-
-    this.hitEnemy = function (player, enemies) {
-
-        console.log("Hit");
-    }
-    
 }
