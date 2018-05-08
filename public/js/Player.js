@@ -12,7 +12,7 @@ function Player(game) {
         y: 0
     }
     this.life = 100;
-    this.velocity = 400;
+    this.velocity = 200;
     //objeto Weapon
     this.weapon = null;
     //sounds

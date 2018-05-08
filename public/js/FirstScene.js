@@ -15,8 +15,7 @@ function FirstScene(game) {
     this.isFiring = false;
 
     this.enemies = {};
-
-    this.text = null;
+    this.healthBar = null;
     this.kills = 0;
     this.bullets;
 
@@ -25,16 +24,18 @@ function FirstScene(game) {
     this.portal;
     this.fondo;
     this.preload = function () {
+
         game.load.audio('disparo', 'assets/audio/EfectosDeSonido/disparo2.mp3');
         game.load.audio('portal', 'assets/audio/EfectosDeSonido/portal.mp3');
         game.load.audio('dead', 'assets/audio/EfectosDeSonido/dead.mp3');
         game.load.audio('musicadefondo', 'assets/audio/EfectosDeSonido/musicadefondo.mp3');
-        
+
         game.load.image('ship', 'assets/images/ship.png');
         game.load.image('star', 'assets/images/star.png');
         game.load.image('portal', 'assets/images/upgrade.png');
         game.load.image('bullet', 'assets/images/bullet.png');
         game.load.image('skull', 'assets/images/skull.png');
+        game.load.image('red', 'assets/images/red.png');
         game.stage.disableVisibilityChange = true;
     }
     this.getIndex = function (id) {
@@ -60,6 +61,8 @@ function FirstScene(game) {
         this.portal = this.game.add.audio('portal');
         this.fondo = this.game.add.audio('musicadefondo');
         this.fondo.loopFull(0.5);
+
+        tileSprite = game.add.tileSprite(0, 0, 8000, 1920, 'red');
 
         //Pedir el mapa
         var that = this;
@@ -91,10 +94,6 @@ function FirstScene(game) {
 
                 //  The Text is positioned at 0, 100
                 let myPosition = that.getIndex(that.myId);
-
-                that.text = game.add.text(10, 10, "Life:" + that.players[myPosition].life +" Kills: " + that.kills, style);
-                that.text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
-                that.text.fixedToCamera = true;
             }
         });
 
@@ -109,7 +108,7 @@ function FirstScene(game) {
                     if (index > -1) {
                         that.players[index].setPosition(element.x, element.y);
                         that.players[index].setRotation(element.rotation);
-
+                        that.players[index].life = element.life;
                         if (element.fire) {
                             that.players[index].fire();
                         }
@@ -133,13 +132,23 @@ function FirstScene(game) {
         this.client.socket.on('damage', function (id) {
             let player_position = that.getIndex(id);
             that.players[player_position].setDamage(10);
-
-            if (that.players[player_position].id == that.myId) {
-                that.text.setText("Life:" + that.players[player_position].getLife() +" Kills : " + that.kills);
-            }
         });
-
-
+        var barConfig = {
+            width: 250,
+            height: 40,
+            x: 180,
+            y: 50,
+            bg: {
+                color: 'red'
+            },
+            bar: {
+                color: 'green'
+            },
+            animationDuration: 200,
+            flipped: false
+        };
+        this.healthBar = new HealthBar(this.game, barConfig);
+        this.healthBar.setFixedToCamera(true);
     }
 
     this.addPlayer = function (element, enemy) {
@@ -183,8 +192,10 @@ function FirstScene(game) {
 
 
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
+
                 this.player.setVelocityX(-this.players[player_position].getVelocity());
             } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+
                 this.player.setVelocityX(this.players[player_position].getVelocity());
             }
 
@@ -195,8 +206,6 @@ function FirstScene(game) {
             }
             var that = this;
 
-            this.bullets = this.player.getWeapon().bullets.children;
-
             if (this.fireButton.isDown) {
                 this.isFiring = true;
                 this.player.fire();
@@ -206,6 +215,7 @@ function FirstScene(game) {
                 this.isFiring = false;
             }
 
+            this.bullets = this.player.getWeapon().bullets.children;
             for (let i = 0, ic = that.players.length; i < ic; i++) {
                 if (that.players[i].id != that.myId) {
                     //this.game.physics.arcade.collide(this.bullets, that.players[i].getSprite());
@@ -217,9 +227,10 @@ function FirstScene(game) {
                 this.game.physics.arcade.overlap(this.player.getSprite(), this.portals[i], this.teleport, null, this);
             }
 
+            this.healthBar.setPercent(this.player.getLife());
             //Reenviar posiciones
             this.client.socket.emit('player_position_refresh', this.player.getInformation(this.myId, this.isFiring));
-            
+
         }
     }
 
@@ -242,11 +253,7 @@ function FirstScene(game) {
     this.setDamage = function (id) {
         let index = this.getIndex(id);
         if ((this.players[index].getLife()) < 10) {
-
             this.client.socket.emit('remove_player', id);
-
-            this.kills++;
-            this.text.setText("Life:" + this.player.getLife() +" Kills: " + this.kills);
         } else {
             this.client.socket.emit('set_damage', id);
         }
@@ -257,7 +264,7 @@ function FirstScene(game) {
             //this.game.debug.body(this.player.getSprite());
 
         }
-        this.game.debug.text('render FPS: ' + this.game.time.fps, 2, 150, 'white');
+        this.game.debug.text('render FPS: ' + this.game.time.fps, 2, 10, 'white');
 
     }
 
