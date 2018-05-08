@@ -1,6 +1,6 @@
 function Renderer(game) {
     this.game = game;
-    this.scene = new FirstScene(game);
+    this.scene = new PrevScene(game);
 
     this.init = function(){
         this.game.stage.disableVisibilityChange = false;

@@ -25,21 +25,7 @@ function FirstScene(game) {
 
     this.preload = function () {
         
-        //sonidos
-        game.load.audio('disparo', 'assets/audio/EfectosDeSonido/disparo2.mp3');
-        game.load.audio('teleportal', 'assets/audio/EfectosDeSonido/portal.mp3');
-        game.load.audio('dead', 'assets/audio/EfectosDeSonido/dead.mp3');
-        game.load.audio('bonus', 'assets/audio/EfectosDeSonido/dead.mp3');
-        game.load.audio('musicadefondo', 'assets/audio/EfectosDeSonido/musicadefondo.mp3');
-
-        game.load.image('ship', 'assets/images/ship.png');
-        game.load.image('star', 'assets/images/star.png');
-        game.load.image('portal', 'assets/images/upgrade.png');
-        game.load.image('bullet', 'assets/images/bullet.png');
-        game.load.image('skull', 'assets/images/skull.png');
-        game.load.image('red', 'assets/images/red.png');
-        game.load.image('bonus', 'assets/images/bonus.png');
-        game.stage.disableVisibilityChange = true;
+       
     }
     this.getIndex = function (id) {
         for (let i = 0, ic = this.players.length; i < ic; i++) {
@@ -134,6 +120,10 @@ function FirstScene(game) {
             that.players[player_position].die();
             // Eliminamos el player del array de players
             that.players.splice(player_position, 1);
+            if(id == that.myId){
+                that.listener();
+            }
+            
         });
 
         this.client.socket.on('damage', function (id) {

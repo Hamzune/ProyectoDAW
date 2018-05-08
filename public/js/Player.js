@@ -178,6 +178,7 @@ function Player(game) {
         this.sprite.anchor.set(0.5, 0.5);
   
     }
+    
     this.render = function () {
 
     }
