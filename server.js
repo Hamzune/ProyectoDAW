@@ -61,7 +61,7 @@ io.on('connection', function (socket) {
         let index = getIndex(id);
         if (index > -1) server.players.splice(index, 1);
 
-        console.log("user " + id + " removed");
+        console.log("user " + id + " killed");
 
     });
 
