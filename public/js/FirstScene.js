@@ -84,7 +84,7 @@ function FirstScene(game) {
         });
 
         //Refrescar mi posicion al servidor cada 10 milisegundos
-        setInterval(function () {
+        /*setInterval(function () {
             if (that.myId != -1) {
                 let myPosition = that.getIndex(that.myId);
                 if (myPosition > -1) {
@@ -95,23 +95,25 @@ function FirstScene(game) {
                     that.client.socket.emit('player_position_refresh', new_position);
                 }
             }
-        }, 16);
+        }, 16);*/
 
-        //Refrescar la posición de los demas y no la mia
+        //Refrescar la posición de los demas
         this.client.socket.on('refresh_all_players', function (data) {
             data.forEach(function (element) {
-                let index = that.getIndex(element.id);
-                // Si ya existe, modificamos la posicion
-                if (index > -1) {
-                    that.players[index].setPosition(element.x, element.y);
-                    that.players[index].setRotation(element.rotation);
+                if (element.id != that.myId) {
+                    let index = that.getIndex(element.id);
+                    // Si ya existe, modificamos la posicion
+                    if (index > -1) {
+                        that.players[index].setPosition(element.x, element.y);
+                        that.players[index].setRotation(element.rotation);
 
-                    if (element.fire) {
-                        that.players[index].fire();
+                        if (element.fire) {
+                            that.players[index].fire();
+                        }
+                    } else {
+                        // si no, lo añadimos.
+                        let p = that.addPlayer(element, true);
                     }
-                } else {
-                    // si no, lo añadimos.
-                    let p = that.addPlayer(element, true);
                 }
             });
         });
@@ -161,6 +163,7 @@ function FirstScene(game) {
         let player_position = this.getIndex(this.myId);
         if (player_position > -1) {
             this.player = this.players[player_position];
+
             if (this.player != null) {
                 this.player.setVelocityX(0);
                 this.player.setVelocityY(0);
@@ -193,6 +196,7 @@ function FirstScene(game) {
 
             if (this.fireButton.isDown) {
                 this.isFiring = true;
+                this.player.fire();
             } else {
                 this.isFiring = false;
             }
@@ -207,12 +211,15 @@ function FirstScene(game) {
             for (let i = 0, ic = this.portals.length; i < ic; i++) {
                 this.game.physics.arcade.overlap(this.player.getSprite(), this.portals[i], this.teleport, null, this);
             }
+
+            this.client.socket.emit('player_position_refresh', this.player.getInformation(this.myId, this.isFiring));
+            
         }
     }
 
-    this.teleport = function(player, portal){
+    this.teleport = function (player, portal) {
         let next = parseInt(Math.random() * this.portals.length);
-        while(portal.x == this.portals[next].x && this.portals[next].y == portal.y){
+        while (portal.x == this.portals[next].x && this.portals[next].y == portal.y) {
             next = parseInt(Math.random() * this.portals.length);
         }
         this.player.getSprite().x = this.portals[next].x + 120;

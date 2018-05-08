@@ -48,7 +48,7 @@ io.on('connection', function (socket) {
         let index = getIndex(data.id);
         if (index > -1) server.players[index] = data;
 
-        io.emit('refresh_all_players', server.players);
+        socket.broadcast.emit('refresh_all_players', server.players);
 
     });
 
@@ -76,7 +76,7 @@ io.on('connection', function (socket) {
             let index = getIndex(socket.player.id);
             if (index > -1) {
                 if (server.players[index].life > 0) {
-                    io.emit('remove', socket.player.id);
+                    socket.broadcast.emit('remove', socket.player.id);
                     if (index > -1) server.players.splice(index, 1);
                 }
             }
@@ -90,10 +90,7 @@ io.on('connection', function (socket) {
     });
 });
 
-reenviar = function(){
-    io.emit('refresh_all_players', server.players);
-}
 
-server.listen(3002, function () {
+server.listen(3000, function () {
     console.log('Listening on ' + server.address().port);
 });
