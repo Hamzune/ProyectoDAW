@@ -15,8 +15,13 @@ function Player(game) {
     this.velocity = 200;
     //objeto Weapon
     this.weapon = null;
+
     //sounds
+    this.disparo;
     this.dead;
+    this.portal;
+    this.bonus;
+
     this.preload = function () {
 
     }
@@ -31,6 +36,12 @@ function Player(game) {
 
         this.sprite.body.collideWorldBounds = true;
 
+        //sounds
+        this.portal = this.game.add.audio('teleportal');
+        this.dead = this.game.add.audio('dead');
+        this.disparo = this.game.add.audio('disparo');
+        this.bonus = this.game.add.audio('bonus');
+
         //añadir arma a jugador 
         this.weapon = game.add.weapon(40, 'bullet');
         this.weapon.setBulletFrames(0, 80, true);
@@ -43,7 +54,7 @@ function Player(game) {
         
         this.weapon.trackSprite(this.sprite, 40, 0, true);
 
-        this.dead = this.game.add.audio('dead');
+        
     }
     this.getSprite = function () {
         return this.sprite;
@@ -51,6 +62,11 @@ function Player(game) {
 
     this.setWeapon = function () {
 
+    }
+    this.teletransporte = function (){
+        this.portal.volume = 0.5;
+        this.portal.play();
+        
     }
 
     this.setDamage = function (damage) {
@@ -75,8 +91,15 @@ function Player(game) {
         this.life = life;
     }
     
+    this.takebonus = function (){
+        this.life = this.life <= 50 ? this.life + 50 : 100;
+        this.bonus.play();
+    }
     this.fire = function() {
-        this.weapon.fire();        
+        this.disparo.volume = 0.1;
+        this.disparo.play();
+        this.weapon.fire();  
+
     }
 
     this.getGame = function () {

@@ -5,6 +5,7 @@ function FirstScene(game) {
 
     this.portals = [];
     this.stars = [];
+    this.bonus = [];
 
     this.players = [];
     this.client;
@@ -20,14 +21,15 @@ function FirstScene(game) {
     this.bullets;
 
     //sonidos
-    this.disparo;
-    this.portal;
     this.fondo;
-    this.preload = function () {
 
+    this.preload = function () {
+        
+        //sonidos
         game.load.audio('disparo', 'assets/audio/EfectosDeSonido/disparo2.mp3');
-        game.load.audio('portal', 'assets/audio/EfectosDeSonido/portal.mp3');
+        game.load.audio('teleportal', 'assets/audio/EfectosDeSonido/portal.mp3');
         game.load.audio('dead', 'assets/audio/EfectosDeSonido/dead.mp3');
+        game.load.audio('bonus', 'assets/audio/EfectosDeSonido/dead.mp3');
         game.load.audio('musicadefondo', 'assets/audio/EfectosDeSonido/musicadefondo.mp3');
 
         game.load.image('ship', 'assets/images/ship.png');
@@ -36,6 +38,7 @@ function FirstScene(game) {
         game.load.image('bullet', 'assets/images/bullet.png');
         game.load.image('skull', 'assets/images/skull.png');
         game.load.image('red', 'assets/images/red.png');
+        game.load.image('bonus', 'assets/images/bonus.png');
         game.stage.disableVisibilityChange = true;
     }
     this.getIndex = function (id) {
@@ -56,9 +59,7 @@ function FirstScene(game) {
 
         this.fireButton = this.game.input.mousePointer;
 
-        //sounds
-        this.disparo = this.game.add.audio('disparo');
-        this.portal = this.game.add.audio('portal');
+        //sonidos
         this.fondo = this.game.add.audio('musicadefondo');
         this.fondo.loopFull(0.5);
 
@@ -77,6 +78,12 @@ function FirstScene(game) {
             that.map.stars.forEach(element => {
                 let sprite = game.add.sprite(element.x, element.y, 'star');
                 that.stars.push(sprite);
+            });
+
+            that.map.bonus.forEach(element => {
+                let sprite = game.add.sprite(element.x, element.y, 'bonus');
+                that.game.physics.arcade.enable(sprite, true);
+                that.bonus.push(sprite);
             });
 
             //Pedir un jugador al servidor
@@ -209,8 +216,7 @@ function FirstScene(game) {
             if (this.fireButton.isDown) {
                 this.isFiring = true;
                 this.player.fire();
-                this.disparo.volume = 0.1;
-                this.disparo.play();
+                
             } else {
                 this.isFiring = false;
             }
@@ -227,6 +233,10 @@ function FirstScene(game) {
                 this.game.physics.arcade.overlap(this.player.getSprite(), this.portals[i], this.teleport, null, this);
             }
 
+            for (let i = 0, ic = this.bonus.length; i < ic; i++) {
+                this.game.physics.arcade.overlap(this.player.getSprite(), this.bonus[i], this.bonuslive, null, this);
+            }
+
             this.healthBar.setPercent(this.player.getLife());
             //Reenviar posiciones
             this.client.socket.emit('player_position_refresh', this.player.getInformation(this.myId, this.isFiring));
@@ -241,13 +251,22 @@ function FirstScene(game) {
         }
         this.player.getSprite().x = this.portals[next].x + 120;
         this.player.getSprite().y = this.portals[next].y + 120;
-        this.portal.play();
-        this.portal.volume = 0.5;
+        this.players[this.getIndex(player.id)].teletransporte();
     }
 
     this.collision = function (bullet, player) {
         bullet.destroy();
         this.setDamage(player.id);
+    }
+
+    this.bonuslive = function (player, bonus){
+        let index = this.getIndex(player.id);
+        if ((this.players[index].getLife()) < 100) {
+            bonus.destroy();
+            this.players[index].takebonus();
+        } else {     
+        }
+
     }
 
     this.setDamage = function (id) {
