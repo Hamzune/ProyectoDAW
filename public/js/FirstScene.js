@@ -17,10 +17,19 @@ function FirstScene(game) {
     this.enemies = {};
 
     this.text = null;
-
+    this.kills = 0;
     this.bullets;
 
+    //sonidos
+    this.disparo;
+    this.portal;
+    this.fondo;
     this.preload = function () {
+        game.load.audio('disparo', 'assets/audio/EfectosDeSonido/disparo2.mp3');
+        game.load.audio('portal', 'assets/audio/EfectosDeSonido/portal.mp3');
+        game.load.audio('dead', 'assets/audio/EfectosDeSonido/dead.mp3');
+        game.load.audio('musicadefondo', 'assets/audio/EfectosDeSonido/musicadefondo.mp3');
+        
         game.load.image('ship', 'assets/images/ship.png');
         game.load.image('star', 'assets/images/star.png');
         game.load.image('portal', 'assets/images/upgrade.png');
@@ -41,10 +50,16 @@ function FirstScene(game) {
         this.grup = this.game.add.group();
         this.grup.enableBody = true;
         this.grup.physicsBodyType = Phaser.Physics.ARCADE;
-        game.physics.startSystem(Phaser.Physics.ARCADE);
-        game.world.setBounds(0, 0, 8000, 1920);
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        this.game.world.setBounds(0, 0, 8000, 1920);
 
         this.fireButton = this.game.input.mousePointer;
+
+        //sounds
+        this.disparo = this.game.add.audio('disparo');
+        this.portal = this.game.add.audio('portal');
+        this.fondo = this.game.add.audio('musicadefondo');
+        this.fondo.loopFull(0.5);
 
         //Pedir el mapa
         var that = this;
@@ -77,25 +92,13 @@ function FirstScene(game) {
                 //  The Text is positioned at 0, 100
                 let myPosition = that.getIndex(that.myId);
 
-                that.text = game.add.text(10, 10, "Life:" + that.players[myPosition].life, style);
+                that.text = game.add.text(10, 10, "Life:" + that.players[myPosition].life +" Kills: " + that.kills, style);
                 that.text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
                 that.text.fixedToCamera = true;
             }
         });
 
-        //Refrescar mi posicion al servidor cada 10 milisegundos
-        /*setInterval(function () {
-            if (that.myId != -1) {
-                let myPosition = that.getIndex(that.myId);
-                if (myPosition > -1) {
-                    let player = that.players[myPosition];
 
-                    let new_position = player.getInformation(that.myId, that.isFiring);
-
-                    that.client.socket.emit('player_position_refresh', new_position);
-                }
-            }
-        }, 16);*/
 
         //Refrescar la posición de los demas
         this.client.socket.on('refresh_all_players', function (data) {
@@ -132,7 +135,7 @@ function FirstScene(game) {
             that.players[player_position].setDamage(10);
 
             if (that.players[player_position].id == that.myId) {
-                that.text.setText("Life:" + that.players[player_position].getLife());
+                that.text.setText("Life:" + that.players[player_position].getLife() +" Kills : " + that.kills);
             }
         });
 
@@ -197,6 +200,8 @@ function FirstScene(game) {
             if (this.fireButton.isDown) {
                 this.isFiring = true;
                 this.player.fire();
+                this.disparo.volume = 0.1;
+                this.disparo.play();
             } else {
                 this.isFiring = false;
             }
@@ -212,6 +217,7 @@ function FirstScene(game) {
                 this.game.physics.arcade.overlap(this.player.getSprite(), this.portals[i], this.teleport, null, this);
             }
 
+            //Reenviar posiciones
             this.client.socket.emit('player_position_refresh', this.player.getInformation(this.myId, this.isFiring));
             
         }
@@ -224,6 +230,8 @@ function FirstScene(game) {
         }
         this.player.getSprite().x = this.portals[next].x + 120;
         this.player.getSprite().y = this.portals[next].y + 120;
+        this.portal.play();
+        this.portal.volume = 0.5;
     }
 
     this.collision = function (bullet, player) {
@@ -233,9 +241,12 @@ function FirstScene(game) {
 
     this.setDamage = function (id) {
         let index = this.getIndex(id);
-        if ((this.players[index].getLife()) <= 10) {
+        if ((this.players[index].getLife()) < 10) {
 
             this.client.socket.emit('remove_player', id);
+
+            this.kills++;
+            this.text.setText("Life:" + this.player.getLife() +" Kills: " + this.kills);
         } else {
             this.client.socket.emit('set_damage', id);
         }

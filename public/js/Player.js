@@ -15,7 +15,8 @@ function Player(game) {
     this.velocity = 400;
     //objeto Weapon
     this.weapon = null;
-
+    //sounds
+    this.dead;
     this.preload = function () {
 
     }
@@ -42,7 +43,7 @@ function Player(game) {
         
         this.weapon.trackSprite(this.sprite, 40, 0, true);
 
-        
+        this.dead = this.game.add.audio('dead');
     }
     this.getSprite = function () {
         return this.sprite;
@@ -147,9 +148,12 @@ function Player(game) {
         let x = this.getPosition().x;
         let y = this.getPosition().y;
         
+        this.dead.play();
+        this.dead.volume = 0.6;
         this.getSprite().kill();
         this.sprite = this.game.add.sprite(x, y, 'skull');
         this.sprite.anchor.set(0.5, 0.5);
+  
     }
     this.render = function () {
 
