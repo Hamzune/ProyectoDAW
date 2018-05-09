@@ -2,7 +2,6 @@ function Player(game) {
     this.id = 0;
     this.game = game;
     this.sprite;
-    this.tocado = false;
     this.rotation = 90;
     this.position = {
         x: 100,
@@ -24,6 +23,8 @@ function Player(game) {
     this.bonus;
 
     this.emitter;
+
+    this.explosions = null;
 
     this.preload = function () {
 
@@ -68,16 +69,35 @@ function Player(game) {
          this.emitter.x = -16;
  
          // setup options for the emitter
+         this.emitter.gravity = -100;
          this.emitter.lifespan = 500;
          this.emitter.maxParticleSpeed = new Phaser.Point(-100,50);
          this.emitter.minParticleSpeed = new Phaser.Point(-200,-50);
  
+        //  An explosion pool
+        this.explosions = game.add.group();
+        this.explosions.createMultiple(30, 'kaboom');
+        this.explosions.forEach(setupInvader, this);
         
     }
     this.getSprite = function () {
         return this.sprite;
     }
 
+    this.tocado = function () {
+        //  And create an explosion :)
+        let explosion =  this.explosions.getFirstExists(false);
+        let cuerpo = this.getSprite().body;
+        explosion.reset(cuerpo.x + (cuerpo.width/2), cuerpo.y + (cuerpo.width/2));
+        explosion.play('kaboom', 30, false, true);
+    }
+    function setupInvader (invader) {
+
+        invader.anchor.x = 0.5;
+        invader.anchor.y = 0.5;
+        invader.animations.add('kaboom');
+    
+    }
     this.setWeapon = function () {
 
     }
@@ -89,6 +109,7 @@ function Player(game) {
 
     this.setDamage = function (damage) {
         this.setLife(this.life-damage);
+        this.tocado();
     }
 
     this.getLife = function() {
@@ -104,6 +125,21 @@ function Player(game) {
             rotation: parseFloat(this.getRotation()).toFixed(5),
             life: this.life
         };
+
+        //Direccion del humo
+        if((new_position.rotation * (180/Math.PI) > 40 && new_position.rotation * (180/Math.PI) < 130) ){
+            this.emitter.gravity = this.getVelocityX()*10;
+        }
+        else if((new_position.rotation * (180/Math.PI) < -40 && new_position.rotation * (180/Math.PI) > -130) ){
+            this.emitter.gravity = -this.getVelocityX()*10;
+        }
+        else if((new_position.rotation * (180/Math.PI) <= 30 && new_position.rotation * (180/Math.PI) >= -30) ){
+            this.emitter.gravity = -this.getVelocityY()*10;
+        }
+        else if((new_position.rotation * (180/Math.PI) > 140 || new_position.rotation * (180/Math.PI) <= -140) ){
+            this.emitter.gravity = this.getVelocityY()*10;
+        }
+
 
         return new_position;
     }
@@ -141,7 +177,13 @@ function Player(game) {
 
         this.velocity.y = y;
     }
+    this.getVelocityY = function () {
+        return this.getSprite().body.velocity.y;
+    }
 
+    this.getVelocityX = function () {
+        return this.getSprite().body.velocity.x;
+    }
     this.setRotation = function (angle){
         this.rotation = angle;
         this.getSprite().rotation = angle;

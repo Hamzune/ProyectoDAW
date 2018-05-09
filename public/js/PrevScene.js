@@ -24,6 +24,8 @@ function PrevScene(game){
         game.load.image('asteroid3', 'assets/images/asteroid3.png');
         game.load.image('asteroid4', 'assets/images/asteroid4.png');
 
+        game.load.spritesheet('kaboom', 'assets/images/explode.png', 128, 128);
+        
         game.stage.disableVisibilityChange = true;
 
     }
@@ -31,9 +33,9 @@ function PrevScene(game){
     this.create = function() {
 
         var tileSprite = game.add.tileSprite(0, 0, 8000, 1920, 'red');
-        var start = game.add.text(game.world.centerX, game.world.centerY-120, "< START >", { font: "65px Arial", fill: "white", align: "center" });
-        var options = game.add.text(game.world.centerX, game.world.centerY, "< OPTIONS >", { font: "65px Arial", fill: "white", align: "center" });
-        var credits = game.add.text(game.world.centerX, game.world.centerY+120, "< CREDITS >", { font: "65px Arial", fill: "white", align: "center" });
+        var start = this.game.add.text(this.game.world.centerX, this.game.world.centerY-120, "< START >", { font: "65px Arial", fill: "white", align: "center" });
+        var options = this.game.add.text(this.game.world.centerX, this.game.world.centerY, "< OPTIONS >", { font: "65px Arial", fill: "white", align: "center" });
+        var credits = this.game.add.text(this.game.world.centerX, this.game.world.centerY+120, "< CREDITS >", { font: "65px Arial", fill: "white", align: "center" });
        
         start.anchor.set(0.5);
         options.anchor.set(0.5);

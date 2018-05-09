@@ -8,8 +8,8 @@ function SecondScene(game){
 
     this.create = function() {
 
-        var stats = game.add.text(game.world.centerX, game.world.centerY-50, "< SHOW STATS >", { font: "65px Arial", fill: "white", align: "center" });
-        var restart = game.add.text(game.world.centerX, game.world.centerY+50, "< PLAY AGAIN >", { font: "65px Arial", fill: "white", align: "center" });
+        var stats = this.game.add.text(this.game.world.centerX, this.game.world.centerY-120, "< SHOW STATS >", { font: "65px Arial", fill: "white", align: "center" });
+        var restart = this.game.add.text(this.game.world.centerX, this.game.world.centerY, "< PLAY AGAIN >", { font: "65px Arial", fill: "white", align: "center" });
         
        
         stats.anchor.set(0.5);

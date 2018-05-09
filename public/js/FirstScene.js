@@ -10,7 +10,7 @@ function FirstScene(game) {
 
     this.players = [];
     this.client;
-
+    
     this.player = null;
     this.myId = -1;
     this.fireButton = null;
@@ -21,6 +21,7 @@ function FirstScene(game) {
     this.kills = 0;
     this.bullets;
 
+    
  
     //sonidos
     this.fondo;
@@ -169,6 +170,9 @@ function FirstScene(game) {
         };
         this.healthBar = new HealthBar(this.game, barConfig);
         this.healthBar.setFixedToCamera(true);
+
+
+
     }
 
     this.addPlayer = function (element, enemy) {
@@ -272,7 +276,10 @@ function FirstScene(game) {
     }
 
     this.collision = function (bullet, player) {
-        bullet.destroy();
+        //let index = this.getIndex(player.id);
+        //this.players[index].tocado();
+
+        bullet.kill();
         this.setDamage(player.id);
     }
 
@@ -280,26 +287,28 @@ function FirstScene(game) {
         let index = this.getIndex(player.id);
         if ((this.players[index].getLife()) < 100) {
             bonus.destroy();
-            this.players[index].takebonus();
-            this.players[index].tocado = false;
-            
-        } else {     
-        }
-
+            this.players[index].takebonus();    
+        } 
     }
+
     this.choceAsteroide = function (player, asteroide){
 
-        let index = this.getIndex(player.id);
-        
         this.setDamage(player.id);
-
-
+        asteroide.destroy();
     }
 
     this.choceAsteroideBullet = function (bullet, asteroide){
 
-        bullet.destroy();
+       
+        /*//  And create an explosion :)
+        var explosion =  this.explosions.getFirstExists(false);
+        explosion.reset(bullet.body.x, bullet.body.y);
+        explosion.play('kaboom', 30, false, true);
+*/
+        bullet.kill();
     }
+
+
 
     this.setDamage = function (id) {
         let index = this.getIndex(id);
