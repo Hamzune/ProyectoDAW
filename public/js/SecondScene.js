@@ -34,7 +34,7 @@ function SecondScene(game){
         restart.events.onInputOut.add(out, this);
 
 
-        stats.events.onInputUp.add(stats, this);
+        stats.events.onInputUp.add(up, this);
         restart.events.onInputUp.add(up, this);
 
     }
@@ -52,7 +52,7 @@ function SecondScene(game){
    
     }
     function stats(item) {
-       
+       item.fill = "red";
    
     }
     function up(item) {
