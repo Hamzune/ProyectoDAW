@@ -96,7 +96,7 @@ function Player(game) {
         this.bonus.play();
     }
     this.fire = function() {
-        this.disparo.volume = 0.1;
+
         this.disparo.play();
         this.weapon.fire();  
 

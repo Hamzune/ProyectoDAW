@@ -104,6 +104,12 @@ function FirstScene(game) {
                         that.players[index].life = element.life;
                         if (element.fire) {
                             that.players[index].fire();
+                            var player = that.players[that.getIndex(that.myId)];
+                            var distance = Math.sqrt(Math.pow((element.x - player.getPosition().x ), 2) + Math.pow((element.y - player.getPosition().y ),2));
+                            var volumen = (1- (distance / 1000 ));
+                            volumen = volumen < 0 ? 0 : volumen ;
+                            that.players[index].disparo.volume = volumen;
+
                         }
                     } else {
                         // si no, lo añadimos.
