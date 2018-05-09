@@ -247,9 +247,9 @@ function FirstScene(game) {
             }
 
             for (let i = 0, ic = this.asteroides.length; i < ic; i++) {
+                this.game.physics.arcade.overlap(this.bullets, this.asteroides[i], this.choceAsteroideBullet, null, this);
                 this.game.physics.arcade.overlap(this.player.getSprite(), this.asteroides[i], this.choceAsteroide, null, this);
             }
-            
             if(this.player.life < 100){
                 this.player.getSprite().addChild(this.player.emitter);
                 this.player.emitter.emitParticle();
@@ -288,10 +288,19 @@ function FirstScene(game) {
 
     }
     this.choceAsteroide = function (player, asteroide){
+
+        let index = this.getIndex(player.id);
+        
         this.setDamage(player.id);
 
 
     }
+
+    this.choceAsteroideBullet = function (bullet, asteroide){
+
+        bullet.destroy();
+    }
+
     this.setDamage = function (id) {
         let index = this.getIndex(id);
         if ((this.players[index].getLife()) < 10) {
