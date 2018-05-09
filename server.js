@@ -14,7 +14,7 @@ app.get('/', function (request, response) {
 var map = {
     portals: [{ x: 500, y: 900 }, { x: 1030, y: 300 }, { x: 2600, y: 400 }],
     stars: [{ x: 100, y: 500 }, { x: 1000, y: 500 }, { x: 4000, y: 500 }],
-    bonus: [{x:100,y:100},{x:200,y:200},{x:1000,y:1000},{x:1500,y:1500},{x:700,y:700},{x:500,y:500},{x:600,y:600}]
+    bonus: [{ x: 100, y: 100 }, { x: 200, y: 200 }, { x: 1000, y: 1000 }, { x: 1500, y: 1500 }, { x: 700, y: 700 }, { x: 500, y: 500 }, { x: 600, y: 600 }]
 };
 
 server.players = [];
@@ -85,8 +85,8 @@ io.on('connection', function (socket) {
         }
     });
 
-    socket.on('error', function (err) { 
-        console.log("Socket.IO Error"); 
+    socket.on('error', function (err) {
+        console.log("Socket.IO Error");
         console.log(err.stack); // this is changed from your code in last comment
     });
 });
