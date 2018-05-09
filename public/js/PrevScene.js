@@ -18,6 +18,12 @@ function PrevScene(game){
         game.load.image('red', 'assets/images/red.png');
         game.load.image('bonus', 'assets/images/bonus.png');
         game.load.image('smoke', 'assets/images/smoke-puff.png');
+        
+        game.load.image('asteroid1', 'assets/images/asteroid1.png');
+        game.load.image('asteroid2', 'assets/images/asteroid2.png');
+        game.load.image('asteroid3', 'assets/images/asteroid3.png');
+        game.load.image('asteroid4', 'assets/images/asteroid4.png');
+
         game.stage.disableVisibilityChange = true;
 
     }

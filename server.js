@@ -11,17 +11,27 @@ app.get('/', function (request, response) {
     response.sendFile(__dirname + "/index.html");
 });
 var bons = [];
-for( let i = 0; i < 30 ; i++){
+var asteroids = [];
+
+for( let i = 0; i < 5 ; i++){
     bon = {
         x: Math.random() * 8000,
         y: Math.random() * 1920
     }
     bons.push(bon);
 }
+for( let i = 0; i < 20 ; i++){
+    ast = {
+        x: Math.random() * 8000,
+        y: Math.random() * 1920
+    }
+    asteroids.push(ast);
+}
 var map = {
     portals: [{ x: 500, y: 900 }, { x: 1030, y: 300 }, { x: 2600, y: 400 }],
     stars: [{ x: 100, y: 500 }, { x: 1000, y: 500 }, { x: 4000, y: 500 }],
-    bonus: bons
+    bonus: bons,
+    asteroides: asteroids
 };
 
 server.players = [];

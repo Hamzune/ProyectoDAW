@@ -6,6 +6,7 @@ function FirstScene(game) {
     this.portals = [];
     this.stars = [];
     this.bonus = [];
+    this.asteroides = [];
 
     this.players = [];
     this.client;
@@ -73,6 +74,12 @@ function FirstScene(game) {
                 that.bonus.push(sprite);
             });
 
+            that.map.asteroides.forEach(element => {
+                let sprite = game.add.sprite(element.x, element.y, 'asteroid1');
+                that.game.physics.arcade.enable(sprite, true);
+                that.asteroides.push(sprite);
+            });
+            
             //Pedir un jugador al servidor
             this.client.createNewPlayer();
         });
@@ -238,6 +245,11 @@ function FirstScene(game) {
             for (let i = 0, ic = this.bonus.length; i < ic; i++) {
                 this.game.physics.arcade.overlap(this.player.getSprite(), this.bonus[i], this.bonuslive, null, this);
             }
+
+            for (let i = 0, ic = this.asteroides.length; i < ic; i++) {
+                this.game.physics.arcade.overlap(this.player.getSprite(), this.asteroides[i], this.choceAsteroide, null, this);
+            }
+            
             if(this.player.life < 100){
                 this.player.getSprite().addChild(this.player.emitter);
                 this.player.emitter.emitParticle();
@@ -275,7 +287,11 @@ function FirstScene(game) {
         }
 
     }
+    this.choceAsteroide = function (player, asteroide){
+        this.setDamage(player.id);
 
+
+    }
     this.setDamage = function (id) {
         let index = this.getIndex(id);
         if ((this.players[index].getLife()) < 10) {
