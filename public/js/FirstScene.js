@@ -84,9 +84,6 @@ function FirstScene(game) {
                 that.myId = that.myId == -1 ? data.id : that.myId;
 
                 that.game.camera.follow(that.addPlayer(data, false).getSprite(), Phaser.Camera.FOLLOW_LOCKON);
-
-                var style = { font: "bold 32px Arial", fill: "#fff", boundsAlignH: "center", boundsAlignV: "middle" };
-
                 //  The Text is positioned at 0, 100
                 let myPosition = that.getIndex(that.myId);
             }
@@ -99,13 +96,16 @@ function FirstScene(game) {
             data.forEach(function (element) {
                 let index = that.getIndex(element.id);
                 // Si ya existe, modificamos la posicion
-                if (index > -1) {
-                    
-                            
+                if (index > -1) {       
+                                        
                     if (element.id != that.myId) {
                         that.players[index].setPosition(element.x, element.y);
                         that.players[index].setRotation(element.rotation);
                         that.players[index].life = element.life;
+                        if(that.players[index].life < 100){
+                            that.players[index].getSprite().addChild(that.players[index].emitter);
+                            that.players[index].emitter.emitParticle();
+                        }
                         if (element.fire && that.getIndex(that.myId) > -1) {
                             that.players[index].fire();
                             var player = that.players[that.getIndex(that.myId)];
@@ -133,6 +133,7 @@ function FirstScene(game) {
             that.players[player_position].die();
             // Eliminamos el player del array de players
             that.players.splice(player_position, 1);
+            // Si soy el que he muerto entra la siguiente escena
             if(id == that.myId){
                 that.listener();
             }
@@ -196,30 +197,23 @@ function FirstScene(game) {
                 var dx = this.game.input.mousePointer.x - this.player.getSprite().worldPosition.x;
 
                 var angle = Math.atan2(dy, dx);
-
                 this.player.setRotation(angle);
-
                 this.weapon = this.player.getWeapon();
             }
 
 
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
-
                 this.player.setVelocityX(-this.players[player_position].getVelocity());
-
             } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
-
                 this.player.setVelocityX(this.players[player_position].getVelocity());
-
             }
 
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.W)) {
                 this.player.setVelocityY(-this.players[player_position].getVelocity());
-
             } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.S)) {
                 this.player.setVelocityY(this.players[player_position].getVelocity());
-                
             }
+
             var that = this;
             if (this.fireButton.isDown) {
                 this.isFiring = true;
@@ -244,7 +238,10 @@ function FirstScene(game) {
             for (let i = 0, ic = this.bonus.length; i < ic; i++) {
                 this.game.physics.arcade.overlap(this.player.getSprite(), this.bonus[i], this.bonuslive, null, this);
             }
-
+            if(this.player.life < 100){
+                this.player.getSprite().addChild(this.player.emitter);
+                this.player.emitter.emitParticle();
+            }
             this.healthBar.setPercent(this.player.getLife());
             //Reenviar posiciones
             this.client.socket.emit('player_position_refresh', this.player.getInformation(this.myId, this.isFiring));
@@ -259,7 +256,7 @@ function FirstScene(game) {
         }
         this.player.getSprite().x = this.portals[next].x + 120;
         this.player.getSprite().y = this.portals[next].y + 120;
-        this.players[this.getIndex(player.id)].teletransporte();
+        this.players[this.getIndex(player.id)].playTeleportSound();
     }
 
     this.collision = function (bullet, player) {

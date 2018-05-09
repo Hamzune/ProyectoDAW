@@ -81,7 +81,7 @@ function Player(game) {
     this.setWeapon = function () {
 
     }
-    this.teletransporte = function (){
+    this.playTeleportSound = function (){
         this.portal.volume = 0.5;
         this.portal.play();
         
@@ -89,17 +89,13 @@ function Player(game) {
 
     this.setDamage = function (damage) {
         this.setLife(this.life-damage);
-        this.tocado = this.life == 100 ? false : true;
-        if(this.tocado == false){
-            this.getSprite().addChild(this.emitter);
-        }
     }
 
     this.getLife = function() {
         return this.life;
     }
+
     this.getInformation = function(id, fire){
-        this.tocado = this.life == 100 ? false : true;
         let new_position = {
             id: id,
             x: this.getPosition().x,
@@ -108,15 +104,10 @@ function Player(game) {
             rotation: parseFloat(this.getRotation()).toFixed(5),
             life: this.life
         };
-        
-        if(this.tocado){
-            this.emitter.emitParticle()
-            console.log("dentro");
-        }
 
         return new_position;
-
     }
+
     this.setLife = function (life){
         this.life = life;
     }
@@ -124,11 +115,8 @@ function Player(game) {
     this.takebonus = function (){
         this.life = this.life <= 50 ? this.life + 50 : 100;
         this.bonus.play();
-        this.tocado = this.life == 100 ? false : true;
-        if(this.tocado == true){
-            this.getSprite().removeChild(this.emitter);
-        }
     }
+    
     this.fire = function() {
 
         this.disparo.play();
