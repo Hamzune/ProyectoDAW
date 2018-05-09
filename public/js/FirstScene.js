@@ -20,6 +20,7 @@ function FirstScene(game) {
     this.kills = 0;
     this.bullets;
 
+ 
     //sonidos
     this.fondo;
 
@@ -76,6 +77,7 @@ function FirstScene(game) {
             this.client.createNewPlayer();
         });
 
+       
         //Recibir mi jugador nuevo
         this.client.socket.on('newPlayer', function (data) {
             if (that.myId == -1) {
@@ -95,14 +97,16 @@ function FirstScene(game) {
         //Refrescar la posición de los demas
         this.client.socket.on('refresh_all_players', function (data) {
             data.forEach(function (element) {
-                if (element.id != that.myId) {
-                    let index = that.getIndex(element.id);
-                    // Si ya existe, modificamos la posicion
-                    if (index > -1) {
+                let index = that.getIndex(element.id);
+                // Si ya existe, modificamos la posicion
+                if (index > -1) {
+                    
+                            
+                    if (element.id != that.myId) {
                         that.players[index].setPosition(element.x, element.y);
                         that.players[index].setRotation(element.rotation);
                         that.players[index].life = element.life;
-                        if (element.fire) {
+                        if (element.fire && that.getIndex(that.myId) > -1) {
                             that.players[index].fire();
                             var player = that.players[that.getIndex(that.myId)];
                             var distance = Math.sqrt(Math.pow((element.x - player.getPosition().x ), 2) + Math.pow((element.y - player.getPosition().y ),2));
@@ -111,11 +115,14 @@ function FirstScene(game) {
                             that.players[index].disparo.volume = volumen;
 
                         }
-                    } else {
-                        // si no, lo añadimos.
-                        let p = that.addPlayer(element, true);
                     }
+
+                } else {
+                    // si no, lo añadimos.
+                    let p = that.addPlayer(element, true);
+                    
                 }
+                
             });
         });
 
@@ -134,7 +141,9 @@ function FirstScene(game) {
 
         this.client.socket.on('damage', function (id) {
             let player_position = that.getIndex(id);
-            that.players[player_position].setDamage(10);
+            let player = that.players[player_position];
+            
+            player.setDamage(10);         
         });
         var barConfig = {
             width: 250,
@@ -169,9 +178,9 @@ function FirstScene(game) {
 
         return p;
     }
-
+    var that = this;
     this.listener = function () {
-        this.game.myrenderer.changeScene(new SecondScene(this.game));
+        that.game.myrenderer.changeScene(new SecondScene(that.game));
     }
 
     this.update = function () {
@@ -197,18 +206,21 @@ function FirstScene(game) {
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
 
                 this.player.setVelocityX(-this.players[player_position].getVelocity());
+
             } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
 
                 this.player.setVelocityX(this.players[player_position].getVelocity());
+
             }
 
             if (this.game.input.keyboard.isDown(Phaser.Keyboard.W)) {
                 this.player.setVelocityY(-this.players[player_position].getVelocity());
+
             } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.S)) {
                 this.player.setVelocityY(this.players[player_position].getVelocity());
+                
             }
             var that = this;
-
             if (this.fireButton.isDown) {
                 this.isFiring = true;
                 this.player.fire();
@@ -260,6 +272,8 @@ function FirstScene(game) {
         if ((this.players[index].getLife()) < 100) {
             bonus.destroy();
             this.players[index].takebonus();
+            this.players[index].tocado = false;
+            
         } else {     
         }
 

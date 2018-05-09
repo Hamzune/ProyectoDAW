@@ -2,6 +2,7 @@ function Player(game) {
     this.id = 0;
     this.game = game;
     this.sprite;
+    this.tocado = false;
     this.rotation = 90;
     this.position = {
         x: 100,
@@ -21,6 +22,8 @@ function Player(game) {
     this.dead;
     this.portal;
     this.bonus;
+
+    this.emitter;
 
     this.preload = function () {
 
@@ -54,6 +57,21 @@ function Player(game) {
         
         this.weapon.trackSprite(this.sprite, 40, 0, true);
 
+         //create an emitter
+         this.emitter = game.add.emitter(0, 0, 1000);
+         this.emitter.makeParticles('smoke');
+ 
+         this.emitter.setScale(0.2, 0, 0.2, 0, 30);
+ 
+         //position the emitter relative to the sprite's anchor location
+         this.emitter.y = 0;
+         this.emitter.x = -16;
+ 
+         // setup options for the emitter
+         this.emitter.lifespan = 500;
+         this.emitter.maxParticleSpeed = new Phaser.Point(-100,50);
+         this.emitter.minParticleSpeed = new Phaser.Point(-200,-50);
+ 
         
     }
     this.getSprite = function () {
@@ -71,12 +89,17 @@ function Player(game) {
 
     this.setDamage = function (damage) {
         this.setLife(this.life-damage);
+        this.tocado = this.life == 100 ? false : true;
+        if(this.tocado == false){
+            this.getSprite().addChild(this.emitter);
+        }
     }
 
     this.getLife = function() {
         return this.life;
     }
     this.getInformation = function(id, fire){
+        this.tocado = this.life == 100 ? false : true;
         let new_position = {
             id: id,
             x: this.getPosition().x,
@@ -85,7 +108,14 @@ function Player(game) {
             rotation: parseFloat(this.getRotation()).toFixed(5),
             life: this.life
         };
+        
+        if(this.tocado){
+            this.emitter.emitParticle()
+            console.log("dentro");
+        }
+
         return new_position;
+
     }
     this.setLife = function (life){
         this.life = life;
@@ -94,6 +124,10 @@ function Player(game) {
     this.takebonus = function (){
         this.life = this.life <= 50 ? this.life + 50 : 100;
         this.bonus.play();
+        this.tocado = this.life == 100 ? false : true;
+        if(this.tocado == true){
+            this.getSprite().removeChild(this.emitter);
+        }
     }
     this.fire = function() {
 
@@ -160,6 +194,7 @@ function Player(game) {
         this.position.y = this.sprite.body.y;
 */
     }
+
     this.getPosition = function() {
         return this.getSprite();
     }

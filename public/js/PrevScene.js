@@ -9,7 +9,7 @@ function PrevScene(game){
         game.load.audio('dead', 'assets/audio/EfectosDeSonido/dead.mp3');
         game.load.audio('bonus', 'assets/audio/EfectosDeSonido/bonus.mp3');
         game.load.audio('musicadefondo', 'assets/audio/EfectosDeSonido/musicadefondo.mp3');
-
+        
         game.load.image('ship', 'assets/images/ship.png');
         game.load.image('star', 'assets/images/star.png');
         game.load.image('portal', 'assets/images/upgrade.png');
@@ -17,13 +17,14 @@ function PrevScene(game){
         game.load.image('skull', 'assets/images/skull.png');
         game.load.image('red', 'assets/images/red.png');
         game.load.image('bonus', 'assets/images/bonus.png');
+        game.load.image('smoke', 'assets/images/smoke-puff.png');
         game.stage.disableVisibilityChange = true;
 
     }
 
     this.create = function() {
 
-        tileSprite = game.add.tileSprite(0, 0, 8000, 1920, 'red');
+        var tileSprite = game.add.tileSprite(0, 0, 8000, 1920, 'red');
         var start = game.add.text(game.world.centerX, game.world.centerY-120, "< START >", { font: "65px Arial", fill: "white", align: "center" });
         var options = game.add.text(game.world.centerX, game.world.centerY, "< OPTIONS >", { font: "65px Arial", fill: "white", align: "center" });
         var credits = game.add.text(game.world.centerX, game.world.centerY+120, "< CREDITS >", { font: "65px Arial", fill: "white", align: "center" });

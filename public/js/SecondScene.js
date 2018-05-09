@@ -25,7 +25,7 @@ function SecondScene(game){
         restart.input.enableDrag();
         restart.input.useHandCursor = true;
 
-
+/*
         stats.events.onInputOver.add(over, this);
         restart.events.onInputOver.add(over, this);
 
@@ -36,7 +36,7 @@ function SecondScene(game){
 
         stats.events.onInputUp.add(up, this);
         restart.events.onInputUp.add(up, this);
-
+*/
     }
 
     function over(item) {
@@ -57,7 +57,7 @@ function SecondScene(game){
     }
     function up(item) {
    
-        this.listener();
+       // this.listener();
    
     }
 
