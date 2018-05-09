@@ -7,7 +7,7 @@ function PrevScene(game){
         game.load.audio('disparo', 'assets/audio/EfectosDeSonido/disparo2.mp3');
         game.load.audio('teleportal', 'assets/audio/EfectosDeSonido/portal.mp3');
         game.load.audio('dead', 'assets/audio/EfectosDeSonido/dead.mp3');
-        game.load.audio('bonus', 'assets/audio/EfectosDeSonido/dead.mp3');
+        game.load.audio('bonus', 'assets/audio/EfectosDeSonido/bonus.mp3');
         game.load.audio('musicadefondo', 'assets/audio/EfectosDeSonido/musicadefondo.mp3');
 
         game.load.image('ship', 'assets/images/ship.png');
