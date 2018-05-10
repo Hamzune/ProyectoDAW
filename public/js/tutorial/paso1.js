@@ -1,4 +1,4 @@
-function FirstScene(game) {
+function Paso1(game) {
     this.game = game;
     this.inputEnabled = true;
     this.map = {};
@@ -16,14 +16,12 @@ function FirstScene(game) {
     this.fireButton = null;
     this.isFiring = false;
 
-
-
     this.enemies = {};
     this.healthBar = null;
     this.kills = 0;
     this.bullets;
 
-    this.popup;
+    
  
     //sonidos
     this.fondo;
@@ -49,9 +47,6 @@ function FirstScene(game) {
         this.game.world.setBounds(0, 0, 8000, 1920);
 
         this.fireButton = this.game.input.mousePointer;
-
-      
-
 
         //sonidos
         this.fondo = this.game.add.audio('musicadefondo');
@@ -197,26 +192,9 @@ function FirstScene(game) {
     }
     var that = this;
     this.listener = function () {
-        //popup
-        this.popup = game.add.sprite(window.innerWidth/2, (window.innerHeight/2), 'game-over');
-        this.popup.alpha = 0.8;
-        this.popup.anchor.set(0.5);
-        this.popup.inputEnabled = true;
-        this.popup.input.enableDrag();
-        this.popup.fixedToCamera = true;
-        this.popup.scale.set(0.01);
-
-        this.game.add.tween(this.popup.scale).to( {x:2.5,y:2.5}, 6000, Phaser.Easing.Elastic.Out, true);
-       
-        setTimeout(()=>{
-            location.reload(); 
-        },7000);
-        //that.game.myrenderer.changeScene(new SecondScene(that.game));
+        that.game.myrenderer.changeScene(new SecondScene(that.game));
     }
-     
-        
-    
-    
+
     this.update = function () {
         let player_position = this.getIndex(this.myId);
         if (player_position > -1) {

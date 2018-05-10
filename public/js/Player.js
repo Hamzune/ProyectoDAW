@@ -128,16 +128,16 @@ function Player(game) {
 
         //Direccion del humo
         if((new_position.rotation * (180/Math.PI) > 40 && new_position.rotation * (180/Math.PI) < 130) ){
-            this.emitter.gravity = this.getVelocityX()*10;
+            this.emitter.gravity = this.getVelocityX()*3;
         }
         else if((new_position.rotation * (180/Math.PI) < -40 && new_position.rotation * (180/Math.PI) > -130) ){
-            this.emitter.gravity = -this.getVelocityX()*10;
+            this.emitter.gravity = -this.getVelocityX()*3;
         }
         else if((new_position.rotation * (180/Math.PI) <= 30 && new_position.rotation * (180/Math.PI) >= -30) ){
-            this.emitter.gravity = -this.getVelocityY()*10;
+            this.emitter.gravity = -this.getVelocityY()*3;
         }
         else if((new_position.rotation * (180/Math.PI) > 140 || new_position.rotation * (180/Math.PI) <= -140) ){
-            this.emitter.gravity = this.getVelocityY()*10;
+            this.emitter.gravity = this.getVelocityY()*3;
         }
 
 
