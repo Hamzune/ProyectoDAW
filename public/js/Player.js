@@ -21,6 +21,7 @@ function Player(game) {
     this.dead;
     this.portal;
     this.bonus;
+    this.boom;
 
     this.emitter;
 
@@ -45,7 +46,7 @@ function Player(game) {
         this.dead = this.game.add.audio('dead');
         this.disparo = this.game.add.audio('disparo');
         this.bonus = this.game.add.audio('bonus');
-
+        this.boom = this.game.add.audio('boom');
         //añadir arma a jugador 
         this.weapon = game.add.weapon(40, 'bullet');
         this.weapon.setBulletFrames(0, 80, true);
@@ -90,6 +91,7 @@ function Player(game) {
         let cuerpo = this.getSprite().body;
         explosion.reset(cuerpo.x + (cuerpo.width/2), cuerpo.y + (cuerpo.width/2));
         explosion.play('kaboom', 30, false, true);
+        this.boom.play();
     }
     function setupInvader (invader) {
 

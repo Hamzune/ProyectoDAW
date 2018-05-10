@@ -115,10 +115,12 @@ function FirstScene(game) {
                         that.players[index].setPosition(element.x, element.y);
                         that.players[index].setRotation(element.rotation);
                         that.players[index].life = element.life;
+                        
                         if(that.players[index].life < 100){
                             that.players[index].getSprite().addChild(that.players[index].emitter);
                             that.players[index].emitter.emitParticle();
                         }
+                       
                         if (element.fire && that.getIndex(that.myId) > -1) {
                             that.players[index].fire();
                             var player = that.players[that.getIndex(that.myId)];
@@ -156,8 +158,14 @@ function FirstScene(game) {
         this.client.socket.on('damage', function (id) {
             let player_position = that.getIndex(id);
             let player = that.players[player_position];
+
+            player.setDamage(10); 
             
-            player.setDamage(10);         
+            var distance = Math.sqrt(Math.pow((player.getPosition().x - that.player.getPosition().x ), 2) + Math.pow((player.getPosition().y - that.player.getPosition().y ),2));
+            var volumen = (1- (distance / 1000 ));
+            volumen = volumen < 0 ? 0 : volumen ;
+            player.boom.volume = volumen;
+
         });
         var barConfig = {
             width: 250,
