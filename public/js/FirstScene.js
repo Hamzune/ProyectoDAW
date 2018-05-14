@@ -49,10 +49,6 @@ function FirstScene(game) {
         this.game.world.setBounds(0, 0, 8000, 1920);
 
         this.fireButton = this.game.input.mousePointer;
-
-      
-
-
         //sonidos
         this.fondo = this.game.add.audio('musicadefondo');
         this.fondo.loopFull(0.5);
@@ -60,7 +56,41 @@ function FirstScene(game) {
         tileSprite = game.add.tileSprite(0, 0, 8000, 1920, 'red');
 
         //Pedir el mapa
+        this.loadMap();
+       
+        //Recibir mi jugador nuevo
+        this.newEnemy();
+
+        //Refrescar la posición de los demas (enemigos)
+        this.moveEnemies();
+
+        // Si se ha desconectado un enemigo ejecutamos el remove
+        this.removePlayer();
+
+        // Aplicar daño a jugadores enemigos
+        this.damageEnemies();
+
+        var barConfig = {
+            width: 250,
+            height: 40,
+            x: 180,
+            y: 50,
+            bg: {
+                color: 'red'
+            },
+            bar: {
+                color: 'green'
+            },
+            animationDuration: 200,
+            flipped: false
+        };
+        this.healthBar = new HealthBar(this.game, barConfig);
+        this.healthBar.setFixedToCamera(true);
+    }
+
+    this.loadMap = function() {
         var that = this;
+
         this.client.getMap().then((map) => {
             that.map = map;
             that.map.portals.forEach(element => {
@@ -90,8 +120,11 @@ function FirstScene(game) {
             this.client.createNewPlayer();
         });
 
-       
-        //Recibir mi jugador nuevo
+    }
+
+    this.newEnemy = function() {
+        var that = this;
+
         this.client.socket.on('newPlayer', function (data) {
             if (that.myId == -1) {
                 that.myId = that.myId == -1 ? data.id : that.myId;
@@ -101,10 +134,45 @@ function FirstScene(game) {
                 let myPosition = that.getIndex(that.myId);
             }
         });
+    }
 
+    this.damageEnemies = function() {
+        var that = this;
 
+        this.client.socket.on('damage', function (id) {
+            let player_position = that.getIndex(id);
+            let player = that.players[player_position];
 
-        //Refrescar la posición de los demas
+            player.setDamage(10); 
+            
+            var distance = Math.sqrt(Math.pow((player.getPosition().x - that.player.getPosition().x ), 2) + Math.pow((player.getPosition().y - that.player.getPosition().y ),2));
+            var volumen = (1- (distance / 1000 ));
+            volumen = volumen < 0 ? 0 : volumen ;
+            player.boom.volume = volumen;
+
+        });
+    }
+
+    this.removePlayer = function() {
+        var that = this;
+
+        this.client.socket.on('remove', function (id) {
+            let player_position = that.getIndex(id);
+            // Destroy al objecto player
+            that.players[player_position].die();
+            // Eliminamos el player del array de players
+            that.players.splice(player_position, 1);
+            // Si soy el que he muerto entra la siguiente escena
+            if(id == that.myId){
+                that.listener();
+            }
+            
+        });
+    }
+
+    this.moveEnemies = function(){
+        var that = this;
+
         this.client.socket.on('refresh_all_players', function (data) {
             data.forEach(function (element) {
                 let index = that.getIndex(element.id);
@@ -140,52 +208,6 @@ function FirstScene(game) {
                 
             });
         });
-
-        // Si se ha desconectado ejecutamos el remove
-        this.client.socket.on('remove', function (id) {
-            let player_position = that.getIndex(id);
-            // Destroy al objecto player
-            that.players[player_position].die();
-            // Eliminamos el player del array de players
-            that.players.splice(player_position, 1);
-            // Si soy el que he muerto entra la siguiente escena
-            if(id == that.myId){
-                that.listener();
-            }
-            
-        });
-
-        this.client.socket.on('damage', function (id) {
-            let player_position = that.getIndex(id);
-            let player = that.players[player_position];
-
-            player.setDamage(10); 
-            
-            var distance = Math.sqrt(Math.pow((player.getPosition().x - that.player.getPosition().x ), 2) + Math.pow((player.getPosition().y - that.player.getPosition().y ),2));
-            var volumen = (1- (distance / 1000 ));
-            volumen = volumen < 0 ? 0 : volumen ;
-            player.boom.volume = volumen;
-
-        });
-        var barConfig = {
-            width: 250,
-            height: 40,
-            x: 180,
-            y: 50,
-            bg: {
-                color: 'red'
-            },
-            bar: {
-                color: 'green'
-            },
-            animationDuration: 200,
-            flipped: false
-        };
-        this.healthBar = new HealthBar(this.game, barConfig);
-        this.healthBar.setFixedToCamera(true);
-
-
-
     }
 
     this.addPlayer = function (element, enemy) {
@@ -222,9 +244,6 @@ function FirstScene(game) {
         //that.game.myrenderer.changeScene(new SecondScene(that.game));
     }
      
-        
-    
-    
     this.update = function () {
         let player_position = this.getIndex(this.myId);
         if (player_position > -1) {
@@ -328,8 +347,6 @@ function FirstScene(game) {
     }
 
     this.choceAsteroideBullet = function (bullet, asteroide){
-
-       
         /*//  And create an explosion :)
         var explosion =  this.explosions.getFirstExists(false);
         explosion.reset(bullet.body.x, bullet.body.y);
@@ -337,8 +354,6 @@ function FirstScene(game) {
 */
         bullet.kill();
     }
-
-
 
     this.setDamage = function (id) {
         let index = this.getIndex(id);
@@ -352,7 +367,6 @@ function FirstScene(game) {
     this.render = function () {
         if (this.player != null) {
             //this.game.debug.body(this.player.getSprite());
-
         }
         this.game.debug.text('render FPS: ' + this.game.time.fps, 2, 10, 'white');
 
