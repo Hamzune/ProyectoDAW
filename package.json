@@ -1,0 +1,28 @@
+{
+  "name": "proyectodaw",
+  "version": "1.0.0",
+  "description": "proyecto daw soufiane & hamza",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "mongodb": "^3.1.0-beta4",
+    "socket.io": "^2.1.0",
+    "uniqid": "^4.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hamzune/ProyectoDAW.git"
+  },
+  "author": "soufiane&hamza",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hamzune/ProyectoDAW/issues"
+  },
+  "homepage": "https://github.com/Hamzune/ProyectoDAW#readme"
+}

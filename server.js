@@ -1,15 +1,40 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
 var server = require('http').Server(app);
 var path = require('path');
 var io = require('socket.io').listen(server);
-var uniqid = require('uniqid');
+var db = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/projecte";
+var dbo = null;
+db.connect(url, function(err, databaseObject){
+    dbo = databaseObject;
+});
 
 app.use('/', express.static(__dirname + '/public/'));
 
 app.get('/', function (request, response) {
-    response.sendFile(__dirname + "/index.html");
+    response.sendFile(__dirname + "/login.html");
 });
+
+app.get('/register', function(request, response){
+    response.sendFile(__dirname + "/register.html");
+});
+
+app.post('/doregister', function(request, response){
+    console.log(request.body);    
+    //dbo.collection('users',)
+});
+
+app.post('/dologin', function(request, response){
+
+    console.log('logged requested');
+});
+
 var bons = [];
 var asteroids = [];
 

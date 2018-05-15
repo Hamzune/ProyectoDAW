@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Crear cuenta</title>
+    <script src="/js/jquery.js"></script>
+    <script>
+        window.onload = function () {
+            $('#register').on('submit', function (e) {
+                var username = $('#username').val();
+                var passwd = $('#passwd').val();
+                var mail = $('#email').val();
+                var userData = {
+                    uname: username,
+                    pwd: passwd,
+                    email: mail
+                };
+                $.ajax({
+                    type: 'post',
+                    data: userData,
+                    url: '/doregister',
+                    success: function () {
+                        console.log('registered succesully');
+                    }
+                });
+                e.preventDefault();
+
+            });
+        };
+    </script>
+</head>
+
+<body>
+    <h1>Register</h1>
+    <form id="register" action="/doregister" method="post">
+        <div>
+            <label for="username">Usuario:</label>
+            <input type="text" name="username" id="username">
+        </div>
+        <div>
+            <label for="username">Contraseña:</label>
+            <input type="password" name="passwd" id="passwd">
+        </div>
+
+        <div>
+            <label for="username">Email:</label>
+            <input type="password" name="passwd" id="email">
+        </div>
+        <div>
+            <input type="submit" value="Regístrate!">
+        </div>
+    </form>
+</body>
+
+</html>
