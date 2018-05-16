@@ -6,10 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login</title>
+    <script src="/js/jquery.js"></script>
+    <script>
+        window.onload = function () {
+            $('#login').on('submit', function (e) {
+                var username = $('#username').val();
+                var passwd = $('#passwd').val();
+                var userData = {
+                    uname: username,
+                    pwd: passwd,
+                };
+                $.ajax({
+                    type: 'post',
+                    data: userData,
+                    url: '/dologin',
+                    success: function (res) {
+                        if(res.status === 200){
+                            location.href = "http://192.168.21.224:3000/";
+                        } else if(res.status === 401){
+                            alert('Combinación usuario / contraseña incorrecta');
+                        } else{
+                            alert('Error desconocido');
+                        }
+                    }
+                });
+                e.preventDefault();
+            });
+        };
+    </script>
 </head>
 
 <body>
-    <form action="/dologin" method="post">
+    <form id="login" action="/dologin" method="post">
         <div>
             <label for="username">Usuario:</label>
             <input type="text" name="username" id="username">

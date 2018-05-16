@@ -22,8 +22,14 @@
                     type: 'post',
                     data: userData,
                     url: '/doregister',
-                    success: function () {
-                        console.log('registered succesully');
+                    success: function (res) {
+                        if(res.status === 200){
+                            location.href = "http://192.168.21.224:3000/login";
+                        } else if(res.status === 401){
+                            alert('Usuario o email ya existe en la BD');
+                        } else{
+                            alert('Error desconocido');
+                        }
                     }
                 });
                 e.preventDefault();
@@ -47,7 +53,7 @@
 
         <div>
             <label for="username">Email:</label>
-            <input type="password" name="passwd" id="email">
+            <input type="text" name="email" id="email">
         </div>
         <div>
             <input type="submit" value="Regístrate!">

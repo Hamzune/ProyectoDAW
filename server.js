@@ -1,51 +1,114 @@
 var express = require('express');
+var session = require('express-session');
+var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var app = express();
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
 var server = require('http').Server(app);
 var path = require('path');
 var io = require('socket.io').listen(server);
 var db = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/projecte";
+
+
 var dbo = null;
-db.connect(url, function(err, databaseObject){
-    dbo = databaseObject;
+db.connect(url, function (err, databaseObject) {
+    dbo = databaseObject.db('projecte');
 });
 
-app.use('/', express.static(__dirname + '/public/'));
+app.use(cookieParser());
 
-app.get('/', function (request, response) {
+// inicializar cookies por 1 dia
+app.use(session({
+    key: 'user_sid',
+    secret: "secret",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        maxAge: 1000 * 60 * 60 * 24
+    }
+}));
+
+app.use('/', express.static(__dirname + '/public/'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+
+var isLogged = function (req, res, next) {
+    if (req.session.user && req.cookies.user_sid) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+};
+app.get('/', isLogged, function (request, response) {
+    response.sendFile(__dirname + "/index.html");
+});
+app.get('/login', function (request, response) {
     response.sendFile(__dirname + "/login.html");
 });
 
-app.get('/register', function(request, response){
+app.get('/logout',function(req, res){
+    res.clearCookie('user_sid');
+    res.redirect('/');
+});
+
+app.get('/register', function (request, response) {
     response.sendFile(__dirname + "/register.html");
 });
 
-app.post('/doregister', function(request, response){
-    console.log(request.body);    
-    //dbo.collection('users',)
+app.post('/doregister', function (request, response) {
+    var user = {
+        username: request.body.uname,
+        password: request.body.pwd,
+        email: request.body.email,
+    };
+    dbo.collection('users').find({ $or: [{ username: user.username }, { email: user.email }] }).toArray().then(function (data) {
+        if (data.length > 0) {
+            response.json({ status: 401 });
+            response.end();
+        } else {
+            dbo.collection('users').insertOne(user, function (err, res) {
+                if (err) {
+                    throw err;
+                }
+                response.json({ status: 200 });
+                response.end();
+            });
+        }
+    });
 });
 
-app.post('/dologin', function(request, response){
+app.post('/dologin', function (request, response) {
+    var user = {
+        username: request.body.uname,
+        password: request.body.pwd,
+    };
 
-    console.log('logged requested');
+    dbo.collection('users').find(user).toArray().then(function (data) {
+        if (data.length === 1) {
+            request.session.user = user;
+            console.log(request.session.user);
+            response.json({ status: 200 });
+            response.end();
+        } else {
+            response.json({ status: 401 });
+            response.end();
+        }
+    });
 });
 
 var bons = [];
 var asteroids = [];
 
-for( let i = 0; i < 5 ; i++){
+for (let i = 0; i < 5; i++) {
     bon = {
         x: Math.random() * 8000,
         y: Math.random() * 1920
     }
     bons.push(bon);
 }
-for( let i = 0; i < 20 ; i++){
+for (let i = 0; i < 20; i++) {
     ast = {
         x: Math.random() * 8000,
         y: Math.random() * 1920
