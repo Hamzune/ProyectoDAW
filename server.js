@@ -64,6 +64,8 @@ app.post('/doregister', function (request, response) {
         email: request.body.email,
         kills: 0,
     };
+
+    console.log(user);
     dbo.collection('users').find({ $or: [{ username: user.username }, { email: user.email }] })
         .toArray()
         .then(function (data) {
@@ -164,8 +166,9 @@ io.on('connection', function (socket) {
 
     socket.on('remove_player', (data) => {
         let killerIndex = getIndex(data.killer_id);
-        user = server.players[killerIndex].db_id._id;
-        dbo.collection('users').updateOne({_id: user},{$set: {kills:1}}, function(err, res){
+        user = server.players[killerIndex].db_id;
+        console.log(user.id);
+        dbo.collection('users').updateOne({_id: user.id},{$set: {kills:1}}, function(err, res){
             if(err){
                 throw err;
             }
