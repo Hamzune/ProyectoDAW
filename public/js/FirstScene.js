@@ -213,7 +213,7 @@ function FirstScene(game) {
     this.addPlayer = function (element, enemy) {
         let p = new Player(this.game);
         p.id = element.id;
-
+        p.db_id = element.db_id;
         p.preload();
         p.create(element.x, element.y);
         if (enemy) {
@@ -287,7 +287,9 @@ function FirstScene(game) {
             for (let i = 0, ic = that.players.length; i < ic; i++) {
                 if (that.players[i].id != that.myId) {
                     //this.game.physics.arcade.collide(this.bullets, that.players[i].getSprite());
-                    this.game.physics.arcade.overlap(this.bullets, that.players[i].getSprite(), this.collision, null, this);
+                    this.game.physics.arcade.overlap(this.bullets, that.players[i].getSprite(), function(bullet,sprite){
+                        this.collision(bullet,sprite);
+                    }, null, this);
                 }
             }
 
@@ -358,7 +360,7 @@ function FirstScene(game) {
     this.setDamage = function (id) {
         let index = this.getIndex(id);
         if ((this.players[index].getLife()) < 10) {
-            this.client.socket.emit('remove_player', id);
+            this.client.socket.emit('remove_player', {killed_id: id, killer_id: this.myId});
         } else {
             this.client.socket.emit('set_damage', id);
         }
