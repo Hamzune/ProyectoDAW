@@ -37,28 +37,44 @@
             });
         };
     </script>
+
+    <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
-    <h1>Register</h1>
-    <form id="register" action="/doregister" method="post">
-        <div>
-            <label for="username">Usuario:</label>
-            <input type="text" name="username" id="username">
+    <div class="cont">
+        <div class="demo">
+            <div class="login">
+                <div class="login__check"></div>
+                <div class="login__form">
+                    <form id="login" action="/dologin" method="post">
+                        <div class="login__row">
+                            <svg class="login__icon name svg-icon" viewBox="0 0 20 20">
+                                <path d="M0,20 a10,8 0 0,1 20,0z M10,0 a4,4 0 0,1 0,8 a4,4 0 0,1 0,-8" />
+                            </svg>
+                            <input type="text" name="username" id="username" class="login__input name" placeholder="Username" />
+                        </div>
+                        <div class="login__row">
+                            <svg class="login__icon pass svg-icon" viewBox="0 0 20 20">
+                                <path d="M0,20 20,20 20,8 0,8z M10,13 10,16z M4,8 a6,8 0 0,1 12,0" />
+                            </svg>
+                            <input type="password" name="passwd" id="passwd" class="login__input pass" placeholder="Password" />
+                        </div>
+                        <div class="login__row">
+                            <svg class="login__icon pass svg-icon" viewBox="0 0 20 20">
+                                <path d="M0,20 20,20 20,8 0,8z M0,8 10,13 20,8z" />
+                            </svg>
+                            <input type="text" name="email" id="email" class="login__input pass" placeholder="Email" />
+                        </div>
+                        <input type="submit" class="login__submit" value="Registrate"/>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div>
-            <label for="username">Contraseña:</label>
-            <input type="password" name="passwd" id="passwd">
-        </div>
-
-        <div>
-            <label for="username">Email:</label>
-            <input type="text" name="email" id="email">
-        </div>
-        <div>
-            <input type="submit" value="Regístrate!">
-        </div>
-    </form>
+    </div>
 </body>
 
+    <script  src="/js/index.js"></script>
 </html>
