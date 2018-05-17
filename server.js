@@ -48,7 +48,7 @@ app.get('/login', function (request, response) {
     response.sendFile(__dirname + "/login.html");
 });
 
-app.get('/logout',function(req, res){
+app.get('/logout', function (req, res) {
     res.clearCookie('user_sid');
     res.redirect('/');
 });
@@ -62,21 +62,26 @@ app.post('/doregister', function (request, response) {
         username: request.body.uname,
         password: request.body.pwd,
         email: request.body.email,
+        kills: 0,
     };
-    dbo.collection('users').find({ $or: [{ username: user.username }, { email: user.email }] }).toArray().then(function (data) {
-        if (data.length > 0) {
-            response.json({ status: 401 });
-            response.end();
-        } else {
-            dbo.collection('users').insertOne(user, function (err, res) {
-                if (err) {
-                    throw err;
-                }
-                response.json({ status: 200 });
+
+    console.log(user);
+    dbo.collection('users').find({ $or: [{ username: user.username }, { email: user.email }] })
+        .toArray()
+        .then(function (data) {
+            if (data.length > 0) {
+                response.json({ status: 401 });
                 response.end();
-            });
-        }
-    });
+            } else {
+                dbo.collection('users').insertOne(user, function (err, res) {
+                    if (err) {
+                        throw err;
+                    }
+                    response.json({ status: 200 });
+                    response.end();
+                });
+            }
+        });
 });
 
 app.post('/dologin', function (request, response) {
@@ -87,9 +92,8 @@ app.post('/dologin', function (request, response) {
 
     dbo.collection('users').find(user).toArray().then(function (data) {
         if (data.length === 1) {
-            request.session.user = user;
-            console.log(request.session.user);
-            response.json({ status: 200 });
+            request.session.user = data[0];
+            response.json({ status: 200, body: data[0] });
             response.end();
         } else {
             response.json({ status: 401 });
@@ -138,16 +142,17 @@ io.on('connection', function (socket) {
 
     io.emit('map', map);
 
-    socket.on('newPlayer', function () {
+    socket.on('newPlayer', function (id) {
         let data = {
             id: server.id++,
             x: Math.random() * 1920,
             y: Math.random() * 900,
-
+            db_id: id,
         };
         server.players.push(data);
         socket.player = data;
         io.emit('newPlayer', data);
+
     });
 
     socket.on('player_position_refresh', function (data) {
@@ -159,22 +164,29 @@ io.on('connection', function (socket) {
     });
 
 
-    socket.on('remove_player', (id) => {
-
-        io.emit('remove', id);
+    socket.on('remove_player', (data) => {
+        let killerIndex = getIndex(data.killer_id);
+        user = server.players[killerIndex].db_id;
+        console.log(user.id);
+        dbo.collection('users').updateOne({_id: user.id},{$set: {kills:1}}, function(err, res){
+            if(err){
+                throw err;
+            }
+            console.log('1 document updated');
+        });
+        io.emit('remove', data.killed_id);
 
         // Buscamos en el array de jugadores al que se acaba de desconectar y lo eliminamos
-        let index = getIndex(id);
+        let index = getIndex(data.killed_id);
         if (index > -1) server.players.splice(index, 1);
 
-        console.log("user " + id + " killed");
+        console.log("user " + data.killed_id + " killed");
 
     });
 
     socket.on('set_damage', (id) => {
         io.emit('damage', id);
     });
-
 
     socket.on('disconnect', () => {
         if (socket.player && typeof socket.player.id !== undefined) {
@@ -194,9 +206,7 @@ io.on('connection', function (socket) {
         console.log("Socket.IO Error");
         console.log(err.stack); // this is changed from your code in last comment
     });
-});
-
-
+});    
 server.listen(3000, function () {
     console.log('Listening on ' + server.address().port);
 });

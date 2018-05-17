@@ -13,7 +13,7 @@ function Client(scene) {
        
     }
     this.createNewPlayer = function(id) {
-        this.socket.emit('newPlayer',{id:id});
+        this.socket.emit('newPlayer',{id:window.localStorage.getItem('id')});
     }
 
     this.movedPlayer = function(player){

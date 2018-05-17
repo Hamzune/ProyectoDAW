@@ -125,7 +125,8 @@ function Player(game) {
             y: this.getPosition().y,
             fire: fire,
             rotation: parseFloat(this.getRotation()).toFixed(5),
-            life: this.life
+            life: this.life,
+            db_id: this.db_id,
         };
 
         //Direccion del humo

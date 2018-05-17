@@ -22,6 +22,7 @@
                     url: '/dologin',
                     success: function (res) {
                         if (res.status === 200) {
+                            window.localStorage.setItem('id',res.body._id);
                             location.href = "http://192.168.21.225:3000/";
                         } else if (res.status === 401) {
                             alert('Combinación usuario / contraseña incorrecta');
