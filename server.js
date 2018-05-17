@@ -8,7 +8,7 @@ var path = require('path');
 var io = require('socket.io').listen(server);
 var db = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/projecte";
-
+var  ObjectID = require('mongodb').ObjectID;
 
 var dbo = null;
 db.connect(url, function (err, databaseObject) {
@@ -102,6 +102,22 @@ app.post('/dologin', function (request, response) {
     });
 });
 
+app.get('/getTop',function(request, response){
+    dbo.collection('users').find().toArray().then(function (data) {
+        if (data.length > 0) {
+            response.json({ status: 200, body: data });
+            response.end();
+        } else {
+            response.json({ status: 401 });
+            response.end();
+        }
+    });
+});
+
+app.get('/top',isLogged, function (request, response) {
+    response.sendFile(__dirname + "/top.html");
+});
+
 var bons = [];
 var asteroids = [];
 
@@ -167,8 +183,9 @@ io.on('connection', function (socket) {
     socket.on('remove_player', (data) => {
         let killerIndex = getIndex(data.killer_id);
         user = server.players[killerIndex].db_id;
+        
         console.log(user.id);
-        dbo.collection('users').updateOne({_id: user.id},{$set: {kills:1}}, function(err, res){
+        dbo.collection('users').updateOne({_id: ObjectID(user.id)},{$inc: {kills:1}}, function(err, res){
             if(err){
                 throw err;
             }

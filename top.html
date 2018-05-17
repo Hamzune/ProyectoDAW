@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TOP</title>
+    <script src="/js/jquery.js"></script>
+    
+    <script>
+        
+         window.onload = function () {
+            function compare (a,b){
+                if(a.kills < b.kills)
+                    return 1;
+                if(a.kills > b.kills)
+                    return -1;
+                return 0;
+            }
+            function imprimirJugadores(res){
+                var tabla = document.createElement('table');
+                for(jugador of res){
+                    var tr = document.createElement('tr');
+
+                    var td1 = document.createElement('td');
+                    var td2 = document.createElement('td');
+
+                    var nombre = document.createTextNode(jugador.username);
+                    var kills = document.createTextNode(jugador.kills);
+                    
+                    td1.appendChild(nombre);
+                    td2.appendChild(kills);
+                    tr.appendChild(td1);
+                    tr.appendChild(td2);
+                    
+                    tabla.appendChild(tr);
+                    //console.log("Usuario: "+jugador.username +" Kills: "+ jugador.kills);
+                }
+                document.body.appendChild(tabla);
+            }
+
+            function misEstadisticas (res,id){
+                var tabla = document.createElement('table');
+                for(jugador of res){
+                    console.log(jugador._id);
+                    if(jugador._id === (id)){
+                        
+                        for(var key in jugador){
+                            var tr = document.createElement('tr');
+                            if(jugador.hasOwnProperty(key)){
+                                var td1 = document.createElement('td');
+                                var td2 = document.createElement('td');
+
+                                var tipo = document.createTextNode(key);
+                                var value = document.createTextNode(jugador[key]);
+                            }  
+
+                            td1.appendChild(tipo);
+                            td2.appendChild(value);
+                            tr.appendChild(td1);
+                            tr.appendChild(td2);
+                            tabla.appendChild(tr);
+                        }
+                    }
+                    
+                }
+                document.body.appendChild(tabla);
+            }
+            
+            $.ajax({
+                type: 'get',
+                url: '/getTop',
+                success: function (res) {
+                    if (res.status === 200) {
+                        res.body.sort(compare);
+                        imprimirJugadores(res.body);
+                        misEstadisticas(res.body,window.localStorage.getItem('id'));
+                    //console.log( window.localStorage.getItem('id'));
+                    
+                    } else if (res.status === 401) {
+                        alert('Combinación usuario / contraseña incorrecta');
+                    } else {
+                        alert('Error desconocido');
+                    }
+                }
+            });
+            
+
+        };
+    </script>
+    <style>
+    table{
+        border: 1px solid black;
+    }
+    </style>
+</head>
+
+<body>
+
+    
+</body>
+
+</html>
