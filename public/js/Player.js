@@ -23,6 +23,9 @@ function Player(game) {
     this.bonus;
     this.boom;
 
+    this.name;
+    this.nombre;
+
     this.emitter;
 
     this.explosions = null;
@@ -31,7 +34,7 @@ function Player(game) {
 
     }
 
-    this.create = function (x, y) {
+    this.create = function (x, y,nom) {
 
         //creacion de sprite player
         this.sprite = this.game.add.sprite(x, y, 'ship');
@@ -40,6 +43,8 @@ function Player(game) {
         this.game.physics.arcade.enable(this.getSprite(),true);
 
         this.sprite.body.collideWorldBounds = true;
+        this.nombre = nom+"";
+        this.name = this.game.add.text(x-4, y-20, this.nombre, { font: "15px Arial", fill: "white", align: "center" });
 
         //sounds
         this.portal = this.game.add.audio('teleportal');
@@ -127,6 +132,7 @@ function Player(game) {
             rotation: parseFloat(this.getRotation()).toFixed(5),
             life: this.life,
             db_id: this.db_id,
+            nombre : this.nombre,
         };
 
         //Direccion del humo
@@ -234,6 +240,8 @@ function Player(game) {
     this.setPosition = function(x,y) {
         this.getSprite().x = x;
         this.getSprite().y = y;
+        this.name.x= x;
+        this.name.y = y;
     }
     this.die = function(){
         let x = this.getPosition().x;

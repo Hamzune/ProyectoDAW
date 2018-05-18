@@ -33,6 +33,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+var nombre;
 
 var isLogged = function (req, res, next) {
     if (req.session.user && req.cookies.user_sid) {
@@ -43,6 +44,8 @@ var isLogged = function (req, res, next) {
 };
 app.get('/', isLogged, function (request, response) {
     response.sendFile(__dirname + "/index.html");
+    nombre = request.session.user.username;
+    
 });
 app.get('/login', function (request, response) {
     response.sendFile(__dirname + "/login.html");
@@ -155,16 +158,21 @@ function getIndex(id) {
 server.id = 0;
 
 io.on('connection', function (socket) {
+    
 
     io.emit('map', map);
 
     socket.on('newPlayer', function (id) {
+
+
         let data = {
             id: server.id++,
             x: Math.random() * 1920,
             y: Math.random() * 900,
             db_id: id,
+            name : nombre,
         };
+
         server.players.push(data);
         socket.player = data;
         io.emit('newPlayer', data);
