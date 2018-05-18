@@ -12,10 +12,12 @@ body{
 }
 
 .contenedor {
-  background: #ccc;
-  width: 1000px;
-  margin:0 auto;
+  background: rgba(200,200,200,0.3);
+  width: 100%;
+  max-width: 1000px;
+  margin:200px auto;
   overflow:hidden;
+   
 }
 
 .top{
@@ -24,9 +26,24 @@ body{
 
 }
 .top tr:nth-child(odd){
-  background: #f8f8f8;
+  background: rgba(100,200,200,0.3);
+ 
+}
+td{
+  padding: 5px;
+}
+.stats tr:nth-child(odd){
+  background: rgba(100,100,200,0.3);
+  
+}
+
+.stats > tr{
+  border-bottom: 1px solid black; 
+  padding: 10px;
+
 }
 .stats{
+  text-align: left;
   float:left;
   width:600px;
 }
@@ -39,6 +56,34 @@ body{
   color:#fff;
 
 }
+h1{
+  float: left;
+  width:20%;
+  margin: 10px 80px;
+  margin-bottom: 20px;
+  display: inline-table;
+
+}
+table{
+  margin: 10px;
+  color: white;
+  text-align: center;
+}
+a{
+
+  margin-left:50px;
+  height: 60px;
+}
+.header{
+  width: 99%;
+  display: inline-table;
+  height: 50px;
+}
+img{
+  height: 50px;
+  margin-top: 10px;
+}
+
 .login_input{
   display:block;
   width: 270px;
