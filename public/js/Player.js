@@ -44,7 +44,7 @@ function Player(game) {
 
         this.sprite.body.collideWorldBounds = true;
         this.nombre = nom+"";
-        this.name = this.game.add.text(x-4, y-20, this.nombre, { font: "15px Arial", fill: "white", align: "center" });
+        this.name = this.game.add.text(x, y-20, this.nombre, { font: "15px Arial", fill: "white", align: "center" });
 
         //sounds
         this.portal = this.game.add.audio('teleportal');
@@ -132,7 +132,7 @@ function Player(game) {
             rotation: parseFloat(this.getRotation()).toFixed(5),
             life: this.life,
             db_id: this.db_id,
-            nombre : this.nombre,
+            name : this.nombre,
         };
 
         //Direccion del humo
@@ -240,8 +240,8 @@ function Player(game) {
     this.setPosition = function(x,y) {
         this.getSprite().x = x;
         this.getSprite().y = y;
-        this.name.x= x;
-        this.name.y = y;
+        this.name.x = x - 25;
+        this.name.y = y - 50;
     }
     this.die = function(){
         let x = this.getPosition().x;
