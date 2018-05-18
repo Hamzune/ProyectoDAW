@@ -10,6 +10,23 @@
             background:black;
         }
     </style>
+    <link rel="stylesheet" href="/css/style.css">
+    <script>
+    window.onload = function () {
+        var div= document.createElement('div');
+        div.setAttribute('class','app__logout');
+        var svg = document.createElement('svg');
+        svg.setAttribute('viewBox',"0 0 20 20");
+        svg.setAttribute('class',"app__logout-icon svg-icon");
+        var path = document.createElement('path');
+        path.setAttribute('d','M6,3 a8,8 0 1,0 8,0 M10,0 10,12');
+        
+        svg.appendChild(path);
+        div.appendChild(svg);
+        document.body.appendChild(div);
+        
+    }
+    </script>
     <script type="text/javascript" src="/js/phaser.min.js"></script>
     <script type="text/javascript" src="/js/Client.js"></script>
     <script type="text/javascript" src="/js/healthBar.js"></script>

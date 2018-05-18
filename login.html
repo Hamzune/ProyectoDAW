@@ -22,7 +22,7 @@
                     url: '/dologin',
                     success: function (res) {
                         if (res.status === 200) {
-                            window.localStorage.setItem('id',res.body._id);
+                            window.localStorage.setItem('id', res.body._id);
                             location.href = "http://192.168.21.225:3000/";
                         } else if (res.status === 401) {
                             alert('Combinación usuario / contraseña incorrecta');
@@ -36,43 +36,34 @@
         };
     </script>
     <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Open+Sans'>
-    
+
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
     <div class="cont">
-        <div class="demo">
-            <div class="login">
-                <div class="login__check"></div>
-                <div class="login__form">
-                    <form id="login" action="/dologin" method="post">
-                        <div class="login__row">
-                            <svg class="login__icon name svg-icon" viewBox="0 0 20 20">
-                                <path d="M0,20 a10,8 0 0,1 20,0z M10,0 a4,4 0 0,1 0,8 a4,4 0 0,1 0,-8" />
-                            </svg>
-                            <input type="text" name="username" id="username" class="login__input name" placeholder="Usuario" />
-                        </div>
-                        <div class="login__row">
-                            <svg class="login__icon pass svg-icon" viewBox="0 0 20 20">
-                                <path d="M0,20 20,20 20,8 0,8z M10,13 10,16z M4,8 a6,8 0 0,1 12,0" />
-                            </svg>
-                            <input type="password" name="passwd" id="passwd" class="login__input pass" placeholder="Contraseña" />
-                        </div>
-                        <input type="submit" class="login__submit" value="Iniciar sesión"/>
-                        <p class="login__signup">No tiene una cuenta? &nbsp;<a href="/register">Registrate</a></p>
-                    </form>
+        <div class="login__form">
+            <form id="login" action="/dologin" method="post">
+                <div class="login__row">
+                    <svg class="login__icon name svg-icon" viewBox="0 0 20 20">
+                        <path d="M0,20 a10,8 0 0,1 20,0z M10,0 a4,4 0 0,1 0,8 a4,4 0 0,1 0,-8" />
+                    </svg>
+                    <input type="text" name="username" id="username" placeholder="Usuario" />
                 </div>
-            </div>
+                <div class="login__row">
+                    <svg class="login__icon pass svg-icon" viewBox="0 0 20 20">
+                        <path d="M0,20 20,20 20,8 0,8z M10,13 10,16z M4,8 a6,8 0 0,1 12,0" />
+                    </svg>
+                    <input type="password" name="passwd" id="passwd" placeholder="Contraseña" />
+                </div>
+                <input type="submit" value="Iniciar sesión" />
+                <p class="login__signup">No tiene una cuenta? &nbsp;
+                    <a href="/register">Registrate</a>
+                </p>
+            </form>
         </div>
     </div>
 
-    
-    
-      
-    
-        <script  src="/js/index.js"></script>
-    
 </body>
 
 </html>

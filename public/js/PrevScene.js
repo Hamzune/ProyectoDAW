@@ -151,7 +151,7 @@ function PrevScene(game){
     }
     function estadisticas(item) {
        
-   
+        window.location.replace("/top");
     }
 
     function up(item) {
