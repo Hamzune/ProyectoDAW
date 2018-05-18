@@ -23,6 +23,8 @@ function FirstScene(game) {
     this.kills = 0;
     this.bullets;
 
+    this.name;
+
     this.popup;
  
     //sonidos
@@ -87,6 +89,7 @@ function FirstScene(game) {
         this.healthBar = new HealthBar(this.game, barConfig);
         this.healthBar.setFixedToCamera(true);
 
+        
         //boton log out
         var boton = this.game.add.sprite(window.innerWidth-60, 60,'logout');
         boton.anchor.set(0.5);
@@ -104,6 +107,7 @@ function FirstScene(game) {
         boton.events.onInputOut.add(()=>{
             boton.alpha = 0.2;
         })
+        
     }
 
     this.loadMap = function() {
@@ -198,8 +202,10 @@ function FirstScene(game) {
                 if (index > -1) {       
                                         
                     if (element.id != that.myId) {
+                        that.players[index].nombre = element.nombre;
                         that.players[index].setPosition(element.x, element.y);
                         that.players[index].setRotation(element.rotation);
+                        
                         that.players[index].life = element.life;
                         
                         if(that.players[index].life < 100){
@@ -233,12 +239,11 @@ function FirstScene(game) {
         p.id = element.id;
         p.db_id = element.db_id;
         p.preload();
-        p.create(element.x, element.y);
+        p.create(element.x, element.y,element.name);
         if (enemy) {
             p.setTint(0xff5100);
         }
         this.game.physics.arcade.enable(p.getSprite(), true);
-
         this.players.push(p);
 
         return p;
@@ -276,6 +281,7 @@ function FirstScene(game) {
 
                 var angle = Math.atan2(dy, dx);
                 this.player.setRotation(angle);
+
                 this.weapon = this.player.getWeapon();
             }
 
@@ -329,6 +335,9 @@ function FirstScene(game) {
             }
             this.healthBar.setPercent(this.player.getLife());
             //Reenviar posiciones
+
+            this.player.name.x = this.player.getPosition().x;
+            this.player.name.y = this.player.getPosition().y;
             this.client.socket.emit('player_position_refresh', this.player.getInformation(this.myId, this.isFiring));
 
         }
