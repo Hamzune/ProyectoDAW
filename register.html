@@ -27,7 +27,7 @@
                         url: '/doregister',
                         success: function (res) {
                             if (res.status === 200) {
-                                location.href = "http://192.168.21.225:3000/login";
+                                location.href = "http://192.168.21.224:3000/login";
                             } else if (res.status === 401) {
                                 alert('Usuario o email ya existe en la BD');
                             } else {
@@ -35,10 +35,12 @@
                             }
                         }
                     });
-                    e.preventDefault();
+                }
+                e.preventDefault();
                 });
+
         }
-        };
+        
     </script>
 
     <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Open+Sans'>
