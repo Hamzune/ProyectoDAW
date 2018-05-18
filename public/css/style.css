@@ -11,6 +11,25 @@ body{
   background: url("../assets/images/red.png") repeat-y;
 }
 
+.contenedor {
+  background: #ccc;
+  width: 1000px;
+  margin:0 auto;
+  overflow:hidden;
+}
+
+.top{
+  width:300px;
+  float:left;
+
+}
+.top tr:nth-child(odd){
+  background: #f8f8f8;
+}
+.stats{
+  float:left;
+  width:600px;
+}
 .login {
   width:100%;
   max-width: 300px;

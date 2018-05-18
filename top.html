@@ -7,10 +7,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>TOP</title>
     <script src="/js/jquery.js"></script>
-    
+    <link rel='stylesheet prefetch' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+    <link rel="stylesheet" href="/css/style.css">
+
     <script>
         
          window.onload = function () {
+            var contenedor = document.getElementsByClassName('contenedor')[0];
+
             function compare (a,b){
                 if(a.kills < b.kills)
                     return 1;
@@ -20,6 +24,16 @@
             }
             function imprimirJugadores(res){
                 var tabla = document.createElement('table');
+                var header = document.createElement('tr');
+                var th = document.createElement('th');
+                th.appendChild(document.createTextNode('Usuario'));
+                var th2 = document.createElement('th');
+                th2.appendChild(document.createTextNode('# Kills'));
+
+                header.appendChild(th);
+                header.appendChild(th2);
+                tabla.appendChild(header);
+                tabla.setAttribute('class','top')
                 for(jugador of res){
                     var tr = document.createElement('tr');
 
@@ -35,15 +49,14 @@
                     tr.appendChild(td2);
                     
                     tabla.appendChild(tr);
-                    //console.log("Usuario: "+jugador.username +" Kills: "+ jugador.kills);
                 }
-                document.body.appendChild(tabla);
+                contenedor.appendChild(tabla);
             }
 
             function misEstadisticas (res,id){
                 var tabla = document.createElement('table');
+                tabla.setAttribute('class','stats');
                 for(jugador of res){
-                    console.log(jugador._id);
                     if(jugador._id === (id)){
                         
                         for(var key in jugador){
@@ -51,11 +64,11 @@
                             if(jugador.hasOwnProperty(key)){
                                 var td1 = document.createElement('td');
                                 var td2 = document.createElement('td');
-
+                                
                                 var tipo = document.createTextNode(key);
                                 var value = document.createTextNode(jugador[key]);
                             }  
-
+                            
                             td1.appendChild(tipo);
                             td2.appendChild(value);
                             tr.appendChild(td1);
@@ -65,7 +78,7 @@
                     }
                     
                 }
-                document.body.appendChild(tabla);
+                contenedor.appendChild(tabla);
             }
             
             $.ajax({
@@ -89,14 +102,13 @@
 
         };
     </script>
-    <style>
-    table{
-        border: 1px solid black;
-    }
-    </style>
 </head>
 
 <body>
+    <div class="contenedor">
+        <h1>Top killers</h1>
+        <a href="/logout">Logout</a>
+    </div>
 
     
 </body>
