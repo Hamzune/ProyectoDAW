@@ -53,7 +53,7 @@ app.get('/login', function (request, response) {
 
 app.get('/logout', function (req, res) {
     res.clearCookie('user_sid');
-    res.redirect('/');
+    res.sendFile(__dirname + "/logout.html");
 });
 
 app.get('/register', function (request, response) {
@@ -68,7 +68,6 @@ app.post('/doregister', function (request, response) {
         kills: 0,
     };
 
-    console.log(user);
     dbo.collection('users').find({ $or: [{ username: user.username }, { email: user.email }] })
         .toArray()
         .then(function (data) {
@@ -158,12 +157,10 @@ function getIndex(id) {
 server.id = 0;
 
 io.on('connection', function (socket) {
-    
 
     io.emit('map', map);
 
     socket.on('newPlayer', function (id) {
-
 
         let data = {
             id: server.id++,
