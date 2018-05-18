@@ -18,23 +18,26 @@
                     pwd: passwd,
                     email: mail
                 };
-                $.ajax({
-                    type: 'post',
-                    data: userData,
-                    url: '/doregister',
-                    success: function (res) {
-                        if(res.status === 200){
-                            location.href = "http://192.168.21.225:3000/login";
-                        } else if(res.status === 401){
-                            alert('Usuario o email ya existe en la BD');
-                        } else{
-                            alert('Error desconocido');
+                if (username == "" || passwd == "" || mail == "") {
+                    alert('Por favor rellene todos los campos!');
+                } else {
+                    $.ajax({
+                        type: 'post',
+                        data: userData,
+                        url: '/doregister',
+                        success: function (res) {
+                            if (res.status === 200) {
+                                location.href = "http://192.168.21.225:3000/login";
+                            } else if (res.status === 401) {
+                                alert('Usuario o email ya existe en la BD');
+                            } else {
+                                alert('Error desconocido');
+                            }
                         }
-                    }
+                    });
+                    e.preventDefault();
                 });
-                e.preventDefault();
-
-            });
+        }
         };
     </script>
 
@@ -44,37 +47,17 @@
 </head>
 
 <body>
-    <div class="cont">
-        <div class="demo">
-            <div class="login">
-                <div class="login__check"></div>
-                <div class="login__form">
-                    <form id="register" action="/doregister" method="post">
-                        <div class="login__row">
-                            <svg class="login__icon name svg-icon" viewBox="0 0 20 20">
-                                <path d="M0,20 a10,8 0 0,1 20,0z M10,0 a4,4 0 0,1 0,8 a4,4 0 0,1 0,-8" />
-                            </svg>
-                            <input type="text" name="username" id="username" class="login__input name" placeholder="Usuario" />
-                        </div>
-                        <div class="login__row">
-                            <svg class="login__icon pass svg-icon" viewBox="0 0 20 20">
-                                <path d="M0,20 20,20 20,8 0,8z M10,13 10,16z M4,8 a6,8 0 0,1 12,0" />
-                            </svg>
-                            <input type="password" name="passwd" id="passwd" class="login__input pass" placeholder="Contraseña" />
-                        </div>
-                        <div class="login__row">
-                            <svg class="login__icon pass svg-icon" viewBox="0 0 20 20">
-                                <path d="M0,20 20,20 20,8 0,8z M0,8 10,13 20,8z" />
-                            </svg>
-                            <input type="text" name="email" id="email" class="login__input pass" placeholder="Email" />
-                        </div>
-                        <input type="submit" class="login__submit" value="Registrate"/>
-                    </form>
-                </div>
-            </div>
-        </div>
+    <div class="login">
+        <form id="register" action="/doregister" method="post">
+            <input type="text" name="username" id="username" class="login_input" placeholder="Usuario"  required/>
+            <input type="password" name="passwd" id="passwd" class="login_input " placeholder="Contraseña" required/>
+            <input type="email" name="email" id="email" class="login_input" placeholder="Email" />
+            <input type="submit" class="login_submit" value="Registrate" />
+        </form>
     </div>
+
 </body>
 
-    <script  src="/js/index.js"></script>
+<script src="/js/index.js"></script>
+
 </html>
