@@ -30,6 +30,9 @@ function FirstScene(game) {
     //sonidos
     this.fondo;
 
+    this.notifications = [];
+    this.indexNotifications = 0;
+
     this.preload = function () {
         
        
@@ -146,7 +149,6 @@ function FirstScene(game) {
 
     this.newEnemy = function() {
         var that = this;
-
         this.client.socket.on('newPlayer', function (data) {
             if (that.myId == -1) {
                 that.myId = that.myId == -1 ? data.id : that.myId;
@@ -202,7 +204,7 @@ function FirstScene(game) {
                 if (index > -1) {       
                                         
                     if (element.id != that.myId) {
-                        that.players[index].nombre = element.nombre;
+                        that.players[index].nombre = element.name;
                         that.players[index].setPosition(element.x, element.y);
                         that.players[index].setRotation(element.rotation);
                         
@@ -222,6 +224,10 @@ function FirstScene(game) {
                             that.players[index].disparo.volume = volumen;
 
                         }
+
+                        for (let i = 0, ic = that.asteroides.length; i < ic; i++) {
+                            that.game.physics.arcade.overlap(that.players[index].getWeapon().bullets.children, that.asteroides[i], that.choceAsteroideBullet, null, that);
+                        }
                     }
 
                 } else {
@@ -235,9 +241,20 @@ function FirstScene(game) {
     }
 
     this.addPlayer = function (element, enemy) {
+
+        this.indexNotifications++;
+
+        if(this.notifications.length === 4){
+            this.indexNotifications = 0;
+        }
+
+        this.notifications[this.indexNotifications] = this.game.add.text(100, 400 + (this.indexNotifications * 20), "Se ha conectado " + element.name, { font: "15px Arial", fill: "white", align: "center" });
+        this.notifications[this.indexNotifications].fixedToCamera = true;
+
         let p = new Player(this.game);
         p.id = element.id;
         p.db_id = element.db_id;
+        p.nombre = element.name;
         p.preload();
         p.create(element.x, element.y,element.name);
         if (enemy) {
@@ -327,7 +344,6 @@ function FirstScene(game) {
 
             for (let i = 0, ic = this.asteroides.length; i < ic; i++) {
                 this.game.physics.arcade.overlap(this.bullets, this.asteroides[i], this.choceAsteroideBullet, null, this);
-                this.game.physics.arcade.overlap(this.player.getSprite(), this.asteroides[i], this.choceAsteroide, null, this);
             }
             if(this.player.life < 100){
                 this.player.getSprite().addChild(this.player.emitter);
@@ -336,8 +352,8 @@ function FirstScene(game) {
             this.healthBar.setPercent(this.player.getLife());
             //Reenviar posiciones
 
-            this.player.name.x = this.player.getPosition().x;
-            this.player.name.y = this.player.getPosition().y;
+            this.player.name.x = this.player.getPosition().x - 25;
+            this.player.name.y = this.player.getPosition().y - 50;
             this.client.socket.emit('player_position_refresh', this.player.getInformation(this.myId, this.isFiring));
 
         }
@@ -387,6 +403,14 @@ function FirstScene(game) {
     this.setDamage = function (id) {
         let index = this.getIndex(id);
         if ((this.players[index].getLife()) < 10) {
+           
+            this.indexNotifications++;
+            if(this.notifications.length === 4){
+                this.indexNotifications = 0;
+            }
+            this.notifications[this.indexNotifications] = null;
+            this.notifications[this.indexNotifications] = this.game.add.text(100, 400 + (this.indexNotifications * 20), this.players[this.getIndex(this.myId)].nombre + " ha matado a " + this.players[index].nombre, { font: "15px Arial", fill: "white", align: "center" });
+            this.notifications[this.indexNotifications].fixedToCamera = true;
             this.client.socket.emit('remove_player', {killed_id: id, killer_id: this.myId});
         } else {
             this.client.socket.emit('set_damage', id);
