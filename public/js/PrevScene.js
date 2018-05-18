@@ -39,6 +39,8 @@ function PrevScene(game){
         game.load.image('red', 'assets/images/red.png');
         game.load.image('bonus', 'assets/images/bonus.png');
         game.load.image('smoke', 'assets/images/smoke-puff.png');
+
+        game.load.image('logout', 'assets/images/shutdown.png');
         
         game.load.image('asteroid1', 'assets/images/asteroid1.png');
         game.load.image('asteroid2', 'assets/images/asteroid2.png');
@@ -59,8 +61,24 @@ function PrevScene(game){
         var start = this.game.add.text(window.innerWidth/2, (window.innerHeight/2)-120, "< START >", { font: "65px Arial", fill: "white", align: "center" });
         var options = this.game.add.text(window.innerWidth/2, (window.innerHeight/2), "< OPTIONS >", { font: "65px Arial", fill: "white", align: "center" });
         var stats = this.game.add.text(window.innerWidth/2, (window.innerHeight/2)+120, "< ESTADISTICAS >", { font: "65px Arial", fill: "white", align: "center" });
-       
-        start  .fixedToCamera = true;
+       //boton log out
+        var boton = this.game.add.sprite(window.innerWidth-60, 60,'logout');
+        boton.anchor.set(0.5);
+        boton.inputEnabled = true;
+        boton.fixedToCamera = true;
+        boton.scale.set(0.3);
+        boton.input.useHandCursor = true;
+        boton.alpha = 0.2;
+        boton.events.onInputUp.add(function(){
+            window.location.replace("/logout")
+        });
+        boton.events.onInputOver.add(()=>{
+            boton.alpha = 1;
+        })
+        boton.events.onInputOut.add(()=>{
+            boton.alpha = 0.2;
+        })
+        start.fixedToCamera = true;
         options.fixedToCamera = true;
         stats.fixedToCamera = true;
 
@@ -79,6 +97,8 @@ function PrevScene(game){
         options.input.useHandCursor = true;
         stats.input.useHandCursor = true;
 
+        
+
         start.events.onInputOver.add(over, this);
         options.events.onInputOver.add(over, this);
         stats.events.onInputOver.add(over, this);
@@ -87,8 +107,7 @@ function PrevScene(game){
         options.events.onInputOut.add(out, this);
         stats.events.onInputOut.add(out, this);
 
-
-
+        
         start.events.onInputUp.add(up, this);
         options.events.onInputUp.add(opciones, this);
         stats.events.onInputUp.add(estadisticas, this);
@@ -111,6 +130,7 @@ function PrevScene(game){
 
    
     }
+
     function opciones(item) {
        
    

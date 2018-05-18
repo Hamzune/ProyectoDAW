@@ -86,6 +86,24 @@ function FirstScene(game) {
         };
         this.healthBar = new HealthBar(this.game, barConfig);
         this.healthBar.setFixedToCamera(true);
+
+        //boton log out
+        var boton = this.game.add.sprite(window.innerWidth-60, 60,'logout');
+        boton.anchor.set(0.5);
+        boton.inputEnabled = true;
+        boton.fixedToCamera = true;
+        boton.scale.set(0.3);
+        boton.input.useHandCursor = true;
+        boton.alpha = 0.2;
+        boton.events.onInputUp.add(function(){
+            window.location.replace("/logout")
+        });
+        boton.events.onInputOver.add(()=>{
+            boton.alpha = 1;
+        })
+        boton.events.onInputOut.add(()=>{
+            boton.alpha = 0.2;
+        })
     }
 
     this.loadMap = function() {
