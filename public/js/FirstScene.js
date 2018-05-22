@@ -10,7 +10,7 @@ function FirstScene(game) {
 
     this.players = [];
     this.client;
-    
+
     this.player = null;
     this.myId = -1;
     this.fireButton = null;
@@ -26,7 +26,7 @@ function FirstScene(game) {
     this.name;
 
     this.popup;
- 
+
     //sonidos
     this.fondo;
 
@@ -34,8 +34,8 @@ function FirstScene(game) {
     this.indexNotifications = 0;
 
     this.preload = function () {
-        
-       
+
+
     }
     this.getIndex = function (id) {
         for (let i = 0, ic = this.players.length; i < ic; i++) {
@@ -62,7 +62,7 @@ function FirstScene(game) {
 
         //Pedir el mapa
         this.loadMap();
-       
+
         //Recibir mi jugador nuevo
         this.newEnemy();
 
@@ -92,28 +92,27 @@ function FirstScene(game) {
         this.healthBar = new HealthBar(this.game, barConfig);
         this.healthBar.setFixedToCamera(true);
 
-        
+
         //boton log out
-        var boton = this.game.add.sprite(window.innerWidth-60, 60,'logout');
+        var boton = this.game.add.sprite(window.innerWidth - 60, 60, 'logout');
         boton.anchor.set(0.5);
         boton.inputEnabled = true;
         boton.fixedToCamera = true;
         boton.scale.set(0.3);
         boton.input.useHandCursor = true;
         boton.alpha = 0.2;
-        boton.events.onInputUp.add(function(){
+        boton.events.onInputUp.add(function () {
             window.location.replace("/logout")
         });
-        boton.events.onInputOver.add(()=>{
+        boton.events.onInputOver.add(() => {
             boton.alpha = 1;
         })
-        boton.events.onInputOut.add(()=>{
+        boton.events.onInputOut.add(() => {
             boton.alpha = 0.2;
         })
-        
     }
 
-    this.loadMap = function() {
+    this.loadMap = function () {
         var that = this;
 
         this.client.getMap().then((map) => {
@@ -138,16 +137,17 @@ function FirstScene(game) {
             that.map.asteroides.forEach(element => {
                 let sprite = game.add.sprite(element.x, element.y, 'asteroid1');
                 that.game.physics.arcade.enable(sprite, true);
+        
                 that.asteroides.push(sprite);
             });
-            
+
             //Pedir un jugador al servidor
             this.client.createNewPlayer();
         });
 
     }
 
-    this.newEnemy = function() {
+    this.newEnemy = function () {
         var that = this;
         this.client.socket.on('newPlayer', function (data) {
             if (that.myId == -1) {
@@ -160,24 +160,24 @@ function FirstScene(game) {
         });
     }
 
-    this.damageEnemies = function() {
+    this.damageEnemies = function () {
         var that = this;
 
         this.client.socket.on('damage', function (id) {
             let player_position = that.getIndex(id);
             let player = that.players[player_position];
 
-            player.setDamage(10); 
-            
-            var distance = Math.sqrt(Math.pow((player.getPosition().x - that.player.getPosition().x ), 2) + Math.pow((player.getPosition().y - that.player.getPosition().y ),2));
-            var volumen = (1- (distance / 1000 ));
-            volumen = volumen < 0 ? 0 : volumen ;
+            player.setDamage(10);
+
+            var distance = Math.sqrt(Math.pow((player.getPosition().x - that.player.getPosition().x), 2) + Math.pow((player.getPosition().y - that.player.getPosition().y), 2));
+            var volumen = (1 - (distance / 1000));
+            volumen = volumen < 0 ? 0 : volumen;
             player.boom.volume = volumen;
 
         });
     }
 
-    this.removePlayer = function() {
+    this.removePlayer = function () {
         var that = this;
 
         this.client.socket.on('remove', function (id) {
@@ -187,45 +187,49 @@ function FirstScene(game) {
             // Eliminamos el player del array de players
             that.players.splice(player_position, 1);
             // Si soy el que he muerto entra la siguiente escena
-            if(id == that.myId){
+            if (id == that.myId) {
                 that.listener();
             }
-            
+
         });
     }
 
-    this.moveEnemies = function(){
+    this.moveEnemies = function () {
         var that = this;
 
         this.client.socket.on('refresh_all_players', function (data) {
             data.forEach(function (element) {
                 let index = that.getIndex(element.id);
                 // Si ya existe, modificamos la posicion
-                if (index > -1) {       
-                                        
+                if (index > -1) {
+
                     if (element.id != that.myId) {
                         that.players[index].nombre = element.name;
                         that.players[index].setPosition(element.x, element.y);
                         that.players[index].setRotation(element.rotation);
-                        
+
                         that.players[index].life = element.life;
-                        
-                        if(that.players[index].life < 100){
+
+                        if (that.players[index].life < 100) {
                             that.players[index].getSprite().addChild(that.players[index].emitter);
                             that.players[index].emitter.emitParticle();
                         }
-                       
+
                         if (element.fire && that.getIndex(that.myId) > -1) {
                             that.players[index].fire();
                             var player = that.players[that.getIndex(that.myId)];
-                            var distance = Math.sqrt(Math.pow((element.x - player.getPosition().x ), 2) + Math.pow((element.y - player.getPosition().y ),2));
-                            var volumen = (1- (distance / 1000 ));
-                            volumen = volumen < 0 ? 0 : volumen ;
+                            var distance = Math.sqrt(Math.pow((element.x - player.getPosition().x), 2) + Math.pow((element.y - player.getPosition().y), 2));
+                            var volumen = (1 - (distance / 1000));
+                            volumen = volumen < 0 ? 0 : volumen;
                             that.players[index].disparo.volume = volumen;
 
                         }
 
                         for (let i = 0, ic = that.asteroides.length; i < ic; i++) {
+                            for (let e = 0, ic = that.asteroides.length; e < ic; e++) {
+                                //that.game.physics.collide(that.asteroides[i],that.asteroides[i])
+                            }
+                            
                             that.game.physics.arcade.overlap(that.players[index].getWeapon().bullets.children, that.asteroides[i], that.choceAsteroideBullet, null, that);
                         }
                     }
@@ -233,9 +237,9 @@ function FirstScene(game) {
                 } else {
                     // si no, lo añadimos.
                     let p = that.addPlayer(element, true);
-                    
+
                 }
-                
+
             });
         });
     }
@@ -244,8 +248,11 @@ function FirstScene(game) {
 
         this.indexNotifications++;
 
-        if(this.notifications.length === 4){
+        if (this.notifications.length === 4) {
             this.indexNotifications = 0;
+            for (let i = 0, ic = 3; i < ic; i++) {
+                if(this.notifications[i]) this.notifications[i].destroy();
+            }
         }
 
         this.notifications[this.indexNotifications] = this.game.add.text(100, 400 + (this.indexNotifications * 20), "Se ha conectado " + element.name, { font: "15px Arial", fill: "white", align: "center" });
@@ -256,7 +263,7 @@ function FirstScene(game) {
         p.db_id = element.db_id;
         p.nombre = element.name;
         p.preload();
-        p.create(element.x, element.y,element.name);
+        p.create(element.x, element.y, element.name);
         if (enemy) {
             p.setTint(0xff5100);
         }
@@ -268,7 +275,7 @@ function FirstScene(game) {
     var that = this;
     this.listener = function () {
         //popup
-        this.popup = game.add.sprite(window.innerWidth/2, (window.innerHeight/2), 'game-over');
+        this.popup = game.add.sprite(window.innerWidth / 2, (window.innerHeight / 2), 'game-over');
         this.popup.alpha = 0.8;
         this.popup.anchor.set(0.5);
         this.popup.inputEnabled = true;
@@ -276,14 +283,14 @@ function FirstScene(game) {
         this.popup.fixedToCamera = true;
         this.popup.scale.set(0.01);
 
-        this.game.add.tween(this.popup.scale).to( {x:2.5,y:2.5}, 6000, Phaser.Easing.Elastic.Out, true);
-       
-        setTimeout(()=>{
-            location.reload(); 
-        },7000);
+        this.game.add.tween(this.popup.scale).to({ x: 2.5, y: 2.5 }, 6000, Phaser.Easing.Elastic.Out, true);
+
+        setTimeout(() => {
+            location.reload();
+        }, 7000);
         //that.game.myrenderer.changeScene(new SecondScene(that.game));
     }
-     
+
     this.update = function () {
         let player_position = this.getIndex(this.myId);
         if (player_position > -1) {
@@ -319,7 +326,7 @@ function FirstScene(game) {
             if (this.fireButton.isDown) {
                 this.isFiring = true;
                 this.player.fire();
-                
+
             } else {
                 this.isFiring = false;
             }
@@ -328,8 +335,8 @@ function FirstScene(game) {
             for (let i = 0, ic = that.players.length; i < ic; i++) {
                 if (that.players[i].id != that.myId) {
                     //this.game.physics.arcade.collide(this.bullets, that.players[i].getSprite());
-                    this.game.physics.arcade.overlap(this.bullets, that.players[i].getSprite(), function(bullet,sprite){
-                        this.collision(bullet,sprite);
+                    this.game.physics.arcade.overlap(this.bullets, that.players[i].getSprite(), function (bullet, sprite) {
+                        this.collision(bullet, sprite);
                     }, null, this);
                 }
             }
@@ -344,8 +351,9 @@ function FirstScene(game) {
 
             for (let i = 0, ic = this.asteroides.length; i < ic; i++) {
                 this.game.physics.arcade.overlap(this.bullets, this.asteroides[i], this.choceAsteroideBullet, null, this);
+
             }
-            if(this.player.life < 100){
+            if (this.player.life < 100) {
                 this.player.getSprite().addChild(this.player.emitter);
                 this.player.emitter.emitParticle();
             }
@@ -377,21 +385,21 @@ function FirstScene(game) {
         this.setDamage(player.id);
     }
 
-    this.bonuslive = function (player, bonus){
+    this.bonuslive = function (player, bonus) {
         let index = this.getIndex(player.id);
         if ((this.players[index].getLife()) < 100) {
             bonus.destroy();
-            this.players[index].takebonus();    
-        } 
+            this.players[index].takebonus();
+        }
     }
 
-    this.choceAsteroide = function (player, asteroide){
+    this.choceAsteroide = function (player, asteroide) {
 
         this.setDamage(player.id);
         asteroide.destroy();
     }
 
-    this.choceAsteroideBullet = function (bullet, asteroide){
+    this.choceAsteroideBullet = function (bullet, asteroide) {
         /*//  And create an explosion :)
         var explosion =  this.explosions.getFirstExists(false);
         explosion.reset(bullet.body.x, bullet.body.y);
@@ -403,15 +411,19 @@ function FirstScene(game) {
     this.setDamage = function (id) {
         let index = this.getIndex(id);
         if ((this.players[index].getLife()) < 10) {
-           
+
             this.indexNotifications++;
-            if(this.notifications.length === 4){
+
+            if (this.notifications.length === 4) {
                 this.indexNotifications = 0;
+                for (let i = 0, ic = 3; i < ic; i++) {
+                    if(this.notifications[i]) this.notifications[i].destroy();
+                }
             }
-            this.notifications[this.indexNotifications] = null;
+
             this.notifications[this.indexNotifications] = this.game.add.text(100, 400 + (this.indexNotifications * 20), this.players[this.getIndex(this.myId)].nombre + " ha matado a " + this.players[index].nombre, { font: "15px Arial", fill: "white", align: "center" });
             this.notifications[this.indexNotifications].fixedToCamera = true;
-            this.client.socket.emit('remove_player', {killed_id: id, killer_id: this.myId});
+            this.client.socket.emit('remove_player', { killed_id: id, killer_id: this.myId });
         } else {
             this.client.socket.emit('set_damage', id);
         }
