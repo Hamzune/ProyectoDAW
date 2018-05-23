@@ -49,6 +49,17 @@ function PrevScene(game){
 
         game.load.spritesheet('kaboom', 'assets/images/explode.png', 128, 128);
         game.load.image('game-over', 'assets/images/game-over.png');
+
+        game.load.image('bg0','assets/images/bkgd_0.png');
+        game.load.image('bg1','assets/images/bkgd_1.png');
+        game.load.image('bg2','assets/images/bkgd_2.png');
+        game.load.image('bg3','assets/images/bkgd_3.png');
+        game.load.image('bg4','assets/images/bkgd_4.png');
+        game.load.image('bg5','assets/images/bkgd_5.png');
+        game.load.image('bg6','assets/images/bkgd_6.png');
+        game.load.image('bg7','assets/images/bkgd_7.png');
+
+
         game.stage.disableVisibilityChange = true;
 
     }
@@ -97,7 +108,7 @@ function PrevScene(game){
         options.input.useHandCursor = true;
         stats.input.useHandCursor = true;
 
-        
+
 
         start.events.onInputOver.add(over, this);
         options.events.onInputOver.add(over, this);

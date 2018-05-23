@@ -8,7 +8,7 @@ var path = require('path');
 var io = require('socket.io').listen(server);
 var db = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/projecte";
-var  ObjectID = require('mongodb').ObjectID;
+var ObjectID = require('mongodb').ObjectID;
 
 var dbo = null;
 db.connect(url, function (err, databaseObject) {
@@ -33,7 +33,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-var nombre;
 
 var isLogged = function (req, res, next) {
     if (req.session.user && req.cookies.user_sid) {
@@ -44,8 +43,6 @@ var isLogged = function (req, res, next) {
 };
 app.get('/', isLogged, function (request, response) {
     response.sendFile(__dirname + "/index.html");
-    nombre = request.session.user.username;
-    
 });
 app.get('/login', function (request, response) {
     response.sendFile(__dirname + "/login.html");
@@ -104,7 +101,7 @@ app.post('/dologin', function (request, response) {
     });
 });
 
-app.get('/getTop',function(request, response){
+app.get('/getTop', function (request, response) {
     dbo.collection('users').find().toArray().then(function (data) {
         if (data.length > 0) {
             response.json({ status: 200, body: data });
@@ -116,7 +113,7 @@ app.get('/getTop',function(request, response){
     });
 });
 
-app.get('/top',isLogged, function (request, response) {
+app.get('/top', isLogged, function (request, response) {
     response.sendFile(__dirname + "/top.html");
 });
 
@@ -167,13 +164,17 @@ io.on('connection', function (socket) {
             x: Math.random() * 1920,
             y: Math.random() * 900,
             db_id: id,
-            name : nombre,
+            name: "PLAYER NAME",
         };
+        console.log(id.id);
+        /*dbo.collection('users').find({ _id: ObjectID(id.id) }).toArray().then(function (user) {
+            data.name = user[0].username;
+    
+        });*/
 
         server.players.push(data);
         socket.player = data;
         io.emit('newPlayer', data);
-
     });
 
     socket.on('player_position_refresh', function (data) {
@@ -188,10 +189,10 @@ io.on('connection', function (socket) {
     socket.on('remove_player', (data) => {
         let killerIndex = getIndex(data.killer_id);
         user = server.players[killerIndex].db_id;
-        
+
         console.log(user.id);
-        dbo.collection('users').updateOne({_id: ObjectID(user.id)},{$inc: {kills:1}}, function(err, res){
-            if(err){
+        dbo.collection('users').updateOne({ _id: ObjectID(user.id) }, { $inc: { kills: 1 } }, function (err, res) {
+            if (err) {
                 throw err;
             }
             console.log('1 document updated');
@@ -228,7 +229,11 @@ io.on('connection', function (socket) {
         console.log("Socket.IO Error");
         console.log(err.stack); // this is changed from your code in last comment
     });
-});    
+
+    setInterval(function () {
+        io.emit('purge', server.players);
+    }, 2000);
+});
 server.listen(3000, function () {
     console.log('Listening on ' + server.address().port);
 });

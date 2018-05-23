@@ -12,7 +12,7 @@ function Player(game) {
         y: 0
     }
     this.life = 100;
-    this.velocity = 400;
+    this.velocity = 250;
     //objeto Weapon
     this.weapon = null;
 
@@ -252,7 +252,11 @@ function Player(game) {
         this.getSprite().kill();
         this.sprite = this.game.add.sprite(x, y, 'skull');
         this.sprite.anchor.set(0.5, 0.5);
-  
+        var that = this;
+        setTimeout(function(){
+            that.sprite.kill();
+            that.name.kill();
+        },6000);
     }
     
     this.render = function () {
