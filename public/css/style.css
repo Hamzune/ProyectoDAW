@@ -7,8 +7,8 @@ input, button {
   border: none;
 }
 
-body{
-  background: url("../assets/images/red.png") repeat-y;
+html{
+  background: url("../assets/images/bkgd_0.png") repeat-y;
 }
 
 .contenedor {

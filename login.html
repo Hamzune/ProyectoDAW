@@ -2,11 +2,20 @@
 <html lang="en">
 
 <head>
+    <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login</title>
     <script src="/js/jquery.js"></script>
+    <link rel="stylesheet" href="/css/login.css" type="text/css">
+    <style>
+
+    img{
+        height: 70% !important;
+        width: 100%;
+    }
+    </style>
     <script>
         window.onload = function () {
             $('#login').on('submit', function (e) {
@@ -42,9 +51,15 @@
 </head>
 
 <body>
+    <div id='stars'></div>
+    <div id='stars2'></div>
+    <div id='stars3'></div>
+
     <div class="login">
+        <img src="/assets/images/default-user.png" alt="">
         <div class="login_check"></div>
         <form id="login" action="/dologin" method="post">
+            
             <input type="text" name="username" id="username" class="login_input" placeholder="Username" />
             <input type="password" name="passwd" id="passwd" class="login_input" placeholder="Password" />
             <input type="submit" class="login_submit" value="Iniciar sesión" />
@@ -52,7 +67,6 @@
             
         </form>
     </div>
-    <script src="js/index.js"></script>
 
 </body>
 
