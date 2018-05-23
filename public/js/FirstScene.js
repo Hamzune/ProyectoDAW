@@ -75,7 +75,6 @@ function FirstScene(game) {
         // Aplicar daño a jugadores enemigos
         this.damageEnemies();
 
-        this.addHealthBar();
 
         var colors = ["bg0", "red"];
         var color = colors[parseInt((Math.random() * 2))];
@@ -132,24 +131,19 @@ function FirstScene(game) {
             }
         });
 
-        this.lp = this.game.add.text(910, 930, "Life", { font: "16px Arial", fill: "white", align: "center" });
-        this.lp.fixedToCamera = true;
+        this.client.socket.on('notification', function(data){
+            that.addNotification(data.msg, data.color);
+        })
 
-        $.ajax({
-            type: 'get',
-            url: '/getLoggedUser',
-            success: function (res) {
-                that.players[that.getIndex(that.myId)];
-            }
-        });
+
     }
 
     this.addHealthBar = function () {
         var barConfig = {
             width: 250,
             height: 40,
-            x: 950,
-            y: 940,
+            x: 280,
+            y: 50 ,
             bg: {
                 color: 'black'
             },
@@ -161,6 +155,9 @@ function FirstScene(game) {
         };
         this.healthBar = new HealthBar(this.game, barConfig);
         this.healthBar.setFixedToCamera(true);
+                   
+        this.lp = this.game.add.text(160 , 90, "Life", { font: "16px Arial", fill: "white", align: "center" });
+        this.lp.fixedToCamera = true;
     }
 
     this.addNotification = function (text, color) {
@@ -208,6 +205,21 @@ function FirstScene(game) {
 
             //Pedir un jugador al servidor
             this.client.createNewPlayer();
+
+            // añadir gui
+            var graphics = game.add.graphics(0, 0);
+
+            // graphics.lineStyle(2, 0xffd900, 1);
+        
+            graphics.beginFill(0x000000, 0.6);
+            graphics.drawCircle(90, 70, 120);
+            graphics.fixedToCamera = true;
+            var g= this.game.add.sprite(60,40,"ship");
+            g.alhpa = 0.6;
+            g.fixedToCamera= true;
+            this.addHealthBar();
+     
+
         });
 
     }
@@ -219,6 +231,17 @@ function FirstScene(game) {
                 that.myId = that.myId == -1 ? data.id : that.myId;
 
                 that.game.camera.follow(that.addPlayer(data, false).getSprite(), Phaser.Camera.FOLLOW_LOCKON);
+                
+                $.ajax({
+                    type: 'get',
+                    url: '/getLoggedUser',
+                    success: function (res) {
+                        var index = that.getIndex(that.myId);
+                        that.players[index].nombre = res.data;
+                        that.players[index].name.setText(res.data);
+                        that.client.socket.emit("notification",{msg: "Se ha conectado " + res.data, color: 'skyblue'});
+                    }
+                });
                 //  The Text is positioned at 0, 100
                 let myPosition = that.getIndex(that.myId);
             }
@@ -270,6 +293,7 @@ function FirstScene(game) {
 
                     if (element.id != that.myId) {
                         that.players[index].nombre = element.name;
+                        that.players[index].name.setText(element.name);
                         that.players[index].setPosition(element.x, element.y);
                         that.players[index].setRotation(element.rotation);
 
@@ -302,20 +326,16 @@ function FirstScene(game) {
                 } else {
                     // si no, lo añadimos.
                     let p = that.addPlayer(element, true);
-                }
+               }
 
             });
         });
     }
 
     this.addPlayer = function (element, enemy) {
-
-        this.addNotification("Se ha conectado " + element.name, "blue");
-
         let p = new Player(this.game);
         p.id = element.id;
         p.db_id = element.db_id;
-        p.nombre = element.name;
         p.preload();
         p.create(element.x, element.y, element.name);
         if (enemy) {
@@ -477,7 +497,7 @@ function FirstScene(game) {
     this.setDamage = function (id) {
         let index = this.getIndex(id);
         if ((this.players[index].getLife()) < 10) {
-            this.addNotification(this.players[this.getIndex(this.myId)].nombre + " ha matado a " + this.players[index].nombre, "red");
+            this.client.socket.emit("notification",{msg: this.players[this.getIndex(this.myId)].nombre + " ha matado a " + this.players[index].nombre, color: 'red'});
             this.client.socket.emit('remove_player', { killed_id: id, killer_id: this.myId });
         } else {
             this.client.socket.emit('set_damage', id);

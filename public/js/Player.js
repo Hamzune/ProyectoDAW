@@ -44,7 +44,6 @@ function Player(game) {
         this.game.physics.arcade.enable(this.getSprite(),true);
 
         this.sprite.body.collideWorldBounds = true;
-        this.nombre = nom+"";
         this.name = this.game.add.text(x, y-20, this.nombre, { font: "15px Arial", fill: "white", align: "center" });
 
         //sounds

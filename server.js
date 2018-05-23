@@ -226,6 +226,10 @@ io.on('connection', function (socket) {
         }
     });
 
+    socket.on('notification', function(data){
+        io.emit('notification', data);
+    })
+
     socket.on('error', function (err) {
         console.log("Socket.IO Error");
         console.log(err.stack); // this is changed from your code in last comment
