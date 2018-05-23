@@ -16,6 +16,7 @@ function Player(game) {
     //objeto Weapon
     this.weapon = null;
 
+    this.disparando = false;
     //sounds
     this.disparo;
     this.dead;
@@ -164,7 +165,11 @@ function Player(game) {
     
     this.fire = function() {
 
-        this.disparo.play();
+        this.disparo.onStop.addOnce(function(){this.disparando=false},this);
+        if(!this.disparando){
+            this.disparo.play();
+            this.disparando = true;
+        }
         this.weapon.fire();  
 
     }

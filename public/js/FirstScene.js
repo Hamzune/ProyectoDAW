@@ -194,6 +194,7 @@ function FirstScene(game) {
             that.map.asteroides.forEach(element => {
                 let sprite = game.add.sprite(element.x, element.y, 'asteroid1');
                 that.game.physics.arcade.enable(sprite, true);
+        
                 that.asteroides.push(sprite);
             });
 
@@ -282,6 +283,10 @@ function FirstScene(game) {
                         }
 
                         for (let i = 0, ic = that.asteroides.length; i < ic; i++) {
+                            for (let e = 0, ic = that.asteroides.length; e < ic; e++) {
+                                //that.game.physics.collide(that.asteroides[i],that.asteroides[i])
+                            }
+                            
                             that.game.physics.arcade.overlap(that.players[index].getWeapon().bullets.children, that.asteroides[i], that.choceAsteroideBullet, null, that);
                         }
                     }
@@ -393,6 +398,7 @@ function FirstScene(game) {
 
             for (let i = 0, ic = this.asteroides.length; i < ic; i++) {
                 this.game.physics.arcade.overlap(this.bullets, this.asteroides[i], this.choceAsteroideBullet, null, this);
+
             }
             if (this.player.life < 100) {
                 this.player.getSprite().addChild(this.player.emitter);
