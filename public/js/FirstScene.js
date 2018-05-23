@@ -134,6 +134,14 @@ function FirstScene(game) {
 
         this.lp = this.game.add.text(910, 930, "Life", { font: "16px Arial", fill: "white", align: "center" });
         this.lp.fixedToCamera = true;
+
+        $.ajax({
+            type: 'get',
+            url: '/getLoggedUser',
+            success: function (res) {
+                that.players[that.getIndex(that.myId)];
+            }
+        });
     }
 
     this.addHealthBar = function () {

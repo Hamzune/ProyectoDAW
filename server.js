@@ -42,6 +42,7 @@ var isLogged = function (req, res, next) {
     }
 };
 app.get('/', isLogged, function (request, response) {
+   
     response.sendFile(__dirname + "/index.html");
 });
 app.get('/login', function (request, response) {
@@ -113,6 +114,11 @@ app.get('/getTop', function (request, response) {
     });
 });
 
+app.get('/getLoggedUser', function(req, res) {
+    res.json({data: req.session.user.username});
+    res.end();
+});
+
 app.get('/top', isLogged, function (request, response) {
     response.sendFile(__dirname + "/top.html");
 });
@@ -166,15 +172,10 @@ io.on('connection', function (socket) {
             db_id: id,
             name: "PLAYER NAME",
         };
-        console.log(id.id);
-        /*dbo.collection('users').find({ _id: ObjectID(id.id) }).toArray().then(function (user) {
-            data.name = user[0].username;
-    
-        });*/
-
+   
         server.players.push(data);
         socket.player = data;
-        io.emit('newPlayer', data);
+    io.emit('newPlayer', data);
     });
 
     socket.on('player_position_refresh', function (data) {
