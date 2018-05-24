@@ -37,6 +37,24 @@ function FirstScene(game) {
 
 
     }
+    var that = this;
+    $(function(){
+        var socket = io();
+        $('form').submit(function(){
+            if($("#msg").val() != ""){
+                socket.emit('chat',that.name._text +":" +$("#msg").val());
+                $('#msg').val('');
+            }
+            return false;
+        })
+        socket.on('chat',function(msg){
+            if($("li").length > 3){             
+                $("li")[0].remove();
+            }
+            $("#messages").append($('<li>').text(msg));
+        })
+    });
+
     this.getIndex = function (id) {
         for (let i = 0, ic = this.players.length; i < ic; i++) {
             if (this.players[i].id == id) {
@@ -134,7 +152,6 @@ function FirstScene(game) {
         this.client.socket.on('notification', function(data){
             that.addNotification(data.msg, data.color);
         })
-
 
     }
 
@@ -370,6 +387,7 @@ function FirstScene(game) {
         if (player_position > -1) {
             this.player = this.players[player_position];
 
+            this.name = this.player.name;
             if (this.player != null) {
                 this.player.setVelocityX(0);
                 this.player.setVelocityY(0);

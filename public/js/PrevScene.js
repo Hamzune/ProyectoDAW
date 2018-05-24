@@ -21,6 +21,11 @@ function PrevScene(game){
 
     this.tecla ;
     this.preload = function () {
+
+        //menu
+        game.load.image('start', 'assets/menu/new_game.png');
+        game.load.image('stats', 'assets/menu/estadisticas.png');
+        game.load.image('settings', 'assets/menu/settings.png');
         //sonidos
         game.load.audio('disparo', 'assets/audio/EfectosDeSonido/disparo2.mp3');
         game.load.audio('teleportal', 'assets/audio/EfectosDeSonido/portal.mp3');
@@ -68,11 +73,16 @@ function PrevScene(game){
 
         this.tecla = this.game.add.audio('tecla'); 
 
-        var tileSprite = game.add.tileSprite(0, 0, 8000, 1920, 'red');
-        var start = this.game.add.text(window.innerWidth/2, (window.innerHeight/2)-120, "< START >", { font: "65px Arial", fill: "white", align: "center" });
-        var options = this.game.add.text(window.innerWidth/2, (window.innerHeight/2), "< OPTIONS >", { font: "65px Arial", fill: "white", align: "center" });
-        var stats = this.game.add.text(window.innerWidth/2, (window.innerHeight/2)+120, "< ESTADISTICAS >", { font: "65px Arial", fill: "white", align: "center" });
-       //boton log out
+        var tileSprite = game.add.tileSprite(0, 0, 8000, 1920, 'bg0');
+       // var start = this.game.add.text(window.innerWidth/2, (window.innerHeight/2)-120, "< START >", { font: "65px Arial", fill: "white", align: "center" });
+        //var options = this.game.add.text(window.innerWidth/2, (window.innerHeight/2), "< OPTIONS >", { font: "65px Arial", fill: "white", align: "center" });
+        //var stats = this.game.add.text(window.innerWidth/2, (window.innerHeight/2)+120, "< ESTADISTICAS >", { font: "65px Arial", fill: "white", align: "center" });
+       
+        var start = this.game.add.sprite(window.innerWidth/2, (window.innerHeight/2)-100, 'start');
+        var options = this.game.add.sprite(window.innerWidth/2, (window.innerHeight/2), 'settings');
+        var stats = this.game.add.sprite(window.innerWidth/2, (window.innerHeight/2)+100, 'stats');
+
+        //boton log out
         var boton = this.game.add.sprite(window.innerWidth-60, 60,'logout');
         boton.anchor.set(0.5);
         boton.inputEnabled = true;
@@ -125,19 +135,31 @@ function PrevScene(game){
 
         text = game.add.text(window.innerWidth/2-460, (window.innerHeight/2)+420, '', { font: "30pt Courier", fill: "#19cb65", stroke: "#119f4e", strokeThickness: 2 });
 
+        this.bg3 = this.game.add.tileSprite(0, this.game.height - this.game.cache.getImage("bg3").height, this.game.width, this.game.cache.getImage("bg3").height, "bg3");
+    
+      
+
+
+
+
+        this.bg3.fixedToCamera = true;
+
+
         this.nextLine();
 
     }
 
     function over(item) {
    
-        item.fill = "red";
+       //hover
+       item.scale.setTo(1.2,1.2);
+
    
     }
    
     function out(item) {
    
-        item.fill = "white";
+        item.scale.setTo(1,1);
 
    
     }
@@ -197,7 +219,9 @@ function PrevScene(game){
     }
 
     this.update = function() {
-       
+
+        this.bg3.tilePosition.y -= 0.25;
+
         
     }
 

@@ -26,9 +26,103 @@
         svg.appendChild(path);
         div.appendChild(svg);
         document.body.appendChild(div);
+
+
+       function compare (a,b){
+           if(a.kills < b.kills)
+               return 1;
+           if(a.kills > b.kills)
+               return -1;
+           return 0;
+       }
+       function imprimirJugadores(res){
+           var tabla = document.createElement('table');
+           var header = document.createElement('tr');
+           var th = document.createElement('th');
+           th.appendChild(document.createTextNode('Usuario'));
+           var th2 = document.createElement('th');
+           th2.appendChild(document.createTextNode('# Kills'));
+
+           header.appendChild(th);
+           header.appendChild(th2);
+           tabla.appendChild(header);
+           tabla.setAttribute('class','top')
+           for(jugador of res){
+               var tr = document.createElement('tr');
+
+               var td1 = document.createElement('td');
+               var td2 = document.createElement('td');
+
+               var nombre = document.createTextNode(jugador.username);
+               var kills = document.createTextNode(jugador.las_sessions);
+               
+               td1.appendChild(nombre);
+               td2.appendChild(kills);
+               tr.appendChild(td1);
+               tr.appendChild(td2);
+               
+               tabla.appendChild(tr);
+           }
+           document.querySelector(".estadisticas").setAttribute("style","display:block");
+           document.querySelector(".estadisticas").removeChild(document.querySelector(".estadisticas").firstChild)
+           document.querySelector(".estadisticas").appendChild(tabla);
+       }
+
+        document.onkeydown = Tab;
+        document.onkeyup = Tabb;
+
+        function Tabb(evt){
+            //console.log("fdf");
+            if(evt.keyCode == 81) {
+                //console.log("y");
+                document.querySelector(".estadisticas").setAttribute("style","display:none");
+            }
+
+        }
+        function Tab(evt){
+            if(evt.keyCode == 81) {
+                $.ajax({
+                    type: 'get',
+                    url: '/getStat',
+                    success: function (res) {
+                        if (res.status === 200) {
+                            res.body.sort(compare);
+                            imprimirJugadores(res.body);
+                        //console.log( window.localStorage.getItem('id'));
+                        
+                        } else if (res.status === 401) {
+                            alert('Combinación usuario / contraseña incorrecta');
+                        } else {
+                            alert('Error desconocido');
+                        }
+                    }
+                });
+       
+            }
+            if(evt.keyCode == 67) {
+                //console.log("c");
+                if(document.querySelector(".chat").getAttribute("mostrado") == "true"){
+                    document.querySelector(".chat").setAttribute("style","display:none");
+                    document.querySelector(".chat").setAttribute("mostrado",false);
+                }
+                else if(document.querySelector(".chat").getAttribute("mostrado") == "false"){
+                    document.querySelector(".chat").setAttribute("style","display:block");
+                    document.querySelector(".chat").setAttribute("mostrado",true);
+
+                }
+
+                
+            }
+        }
+
         
+            
+            
     }
+
+
     </script>
+
     <script type="text/javascript" src="/js/phaser.min.js"></script>
     <script type="text/javascript" src="/js/Client.js"></script>
     <script type="text/javascript" src="/js/healthBar.js"></script>
@@ -43,5 +137,13 @@
 </head>
 <body>
 
+    <div class="estadisticas">
+    </div>
+    <div class="chat" mostrado="false">
+        <form action="">
+            <input id="msg" autocomplete="off"/>
+        </form>
+        <ul id="messages"></ul>
+    </div>
 </body>
 </html>

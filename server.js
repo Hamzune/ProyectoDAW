@@ -6,6 +6,7 @@ var app = express();
 var server = require('http').Server(app);
 var path = require('path');
 var io = require('socket.io').listen(server);
+
 var db = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/projecte";
 var ObjectID = require('mongodb').ObjectID;
@@ -64,6 +65,7 @@ app.post('/doregister', function (request, response) {
         password: request.body.pwd,
         email: request.body.email,
         kills: 0,
+        las_sessions: 0
     };
 
     dbo.collection('users').find({ $or: [{ username: user.username }, { email: user.email }] })
@@ -114,6 +116,30 @@ app.get('/getTop', function (request, response) {
     });
 });
 
+app.get('/getStat', isLogged, function (request, response) {
+    dbo.collection('users').find().toArray().then(function (data) {
+       var conectados = [];
+       for( player of server.players) {
+        for(playerdb of data) {
+           if(playerdb._id == player.db_id.id){
+               conectados.push(playerdb);
+           }
+
+        }
+       }
+       
+        if (conectados.length > 0) {
+            response.json({ status: 200, body: conectados });
+            response.end();
+        } else {
+            response.json({ status: 200, body: data });
+            response.end();
+        }
+    });
+});
+
+
+
 app.get('/getLoggedUser', function(req, res) {
     res.json({data: req.session.user.username});
     res.end();
@@ -163,6 +189,9 @@ io.on('connection', function (socket) {
 
     io.emit('map', map);
 
+    socket.on('chat',function(msg){
+        io.emit('chat',msg);
+    })
     socket.on('newPlayer', function (id) {
 
         let data = {
@@ -189,15 +218,23 @@ io.on('connection', function (socket) {
 
     socket.on('remove_player', (data) => {
         let killerIndex = getIndex(data.killer_id);
+        let killed = getIndex(data.killed_id);
         user = server.players[killerIndex].db_id;
+        userKilled = server.players[killed].db_id;
 
-        console.log(user.id);
-        dbo.collection('users').updateOne({ _id: ObjectID(user.id) }, { $inc: { kills: 1 } }, function (err, res) {
+        dbo.collection('users').updateOne({ _id: ObjectID(user.id) }, { $inc:   { kills: 1 , las_sessions : 1}  }, function (err, res) {
             if (err) {
                 throw err;
             }
             console.log('1 document updated');
         });
+        dbo.collection('users').updateOne({ _id: ObjectID(userKilled.id) },  {$set: { las_sessions : 0}} , function (err, res) {
+            if (err) {
+                throw err;
+            }
+            console.log('1 document updated');
+        });
+        
         io.emit('remove', data.killed_id);
 
         // Buscamos en el array de jugadores al que se acaba de desconectar y lo eliminamos
