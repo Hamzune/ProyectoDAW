@@ -57,7 +57,7 @@ function Player(game) {
         this.weapon.setBulletFrames(0, 80, true);
         this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
         this.weapon.bulletSpeed = 1000;
-        this.weapon.fireRate = 400;
+        this.weapon.fireRate = 345;
 
         this.weapon.bullets.setAll('scale.x', 2);
         this.weapon.bullets.setAll('scale.y', 2);
