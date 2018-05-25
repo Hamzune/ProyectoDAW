@@ -34,16 +34,39 @@ html{
 .chat{
   position: absolute;
   width: 200px;
-  max-height: 100px;
   background: rgba(100,100,200,0.9);
   right: 20px;
-  margin-top: 500px;
+  bottom: 10px;
   z-index: 10;
   border-radius: 10px; 
   font-family: "verdana";
   color: white;
   padding: 10px;
-  display: none;
+  opacity: 0;
+}
+
+::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color:inherit;
+	border-radius: 10px;
+}
+
+::-webkit-scrollbar
+{
+	width: 10px;
+	background-color:inherit;
+}
+
+::-webkit-scrollbar-thumb
+{
+	border-radius: 10px;
+	background-image: -webkit-gradient(linear,
+									   left bottom,
+									   left top,
+									   color-stop(0.44, rgb(122,153,217)),
+									   color-stop(0.72, rgb(73,125,189)),
+									   color-stop(0.86, rgb(28,58,148)));
 }
 #msg{
   border: none;
@@ -51,9 +74,29 @@ html{
   border-bottom: 1px solid white;
   width: 100%;
 }
+p{
+  color: #e76e22;
+}
+#messages{
+  max-height: 200px;
+  max-width: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.atras{
+  position: absolute;
+  top: 20px;
+  left: 20px;
 
+}
+
+#atr{
+  height: 10% ;
+  cursor: pointer;
+}
 #messages li{
-  list-style: none
+  list-style: none;
+  
 }
 .top{
   width:300px;

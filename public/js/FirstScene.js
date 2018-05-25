@@ -18,6 +18,7 @@ function FirstScene(game) {
 
     this.lp = null;
 
+    this.writing = false;
     this.enemies = {};
     this.healthBar = null;
     this.kills = 0;
@@ -48,10 +49,15 @@ function FirstScene(game) {
             return false;
         })
         socket.on('chat',function(msg){
-            if($("li").length > 3){             
-                $("li")[0].remove();
+            var minombre = msg.substr(0,that.name._text.length);
+            
+            if(minombre == that.name._text){
+                $("#messages").append($('<li>').html("<p>"+msg+"</p>"));
+                
+            }else{
+                $("#messages").append($('<li>').text(msg));
             }
-            $("#messages").append($('<li>').text(msg));
+            $("#messages").scrollTop($("#messages")[0].scrollHeight);
         })
     });
 
@@ -160,7 +166,7 @@ function FirstScene(game) {
             width: 250,
             height: 40,
             x: 280,
-            y: 50 ,
+            y: 70 ,
             bg: {
                 color: 'black'
             },
@@ -173,7 +179,7 @@ function FirstScene(game) {
         this.healthBar = new HealthBar(this.game, barConfig);
         this.healthBar.setFixedToCamera(true);
                    
-        this.lp = this.game.add.text(160 , 90, "Life", { font: "16px Arial", fill: "white", align: "center" });
+        this.lp = this.game.add.text(250 , 60, "Life", { font: "16px Arial", fill: "white", align: "center" });
         this.lp.fixedToCamera = true;
     }
 
@@ -198,6 +204,7 @@ function FirstScene(game) {
             that.map = map;
             that.map.portals.forEach(element => {
                 let sprite = game.add.sprite(element.x, element.y, 'portal');
+                sprite.anchor.setTo(0.5,0.5);
                 that.game.physics.arcade.enable(sprite, true);
                 that.portals.push(sprite);
             });
@@ -310,7 +317,7 @@ function FirstScene(game) {
 
                     if (element.id != that.myId) {
                         that.players[index].nombre = element.name;
-                        that.players[index].name.setText(element.name);
+                        that.players[index].name.setText(element.name + "");
                         that.players[index].setPosition(element.x, element.y);
                         that.players[index].setRotation(element.rotation);
 
@@ -401,18 +408,33 @@ function FirstScene(game) {
                 this.weapon = this.player.getWeapon();
             }
 
+            if(!this.writing){
+                if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
 
-            if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
-
-                this.player.setVelocityX(-this.players[player_position].getVelocity());
-            } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
-                this.player.setVelocityX(this.players[player_position].getVelocity());
+                    this.player.setVelocityX(-this.players[player_position].getVelocity());
+                } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+                    this.player.setVelocityX(this.players[player_position].getVelocity());
+                }
+    
+                if (this.game.input.keyboard.isDown(Phaser.Keyboard.W) ) {
+                    this.player.setVelocityY(-this.players[player_position].getVelocity());
+                } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.S)) {
+                    this.player.setVelocityY(this.players[player_position].getVelocity());
+                }
+    
             }
+            
+            if(this.game.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
+                document.querySelector(".chat").setAttribute("style","opacity:1");
+                document.querySelector("#msg").removeAttribute("disabled");
+                document.querySelector("#msg").focus();
+                this.writing = true;
 
-            if (this.game.input.keyboard.isDown(Phaser.Keyboard.W)) {
-                this.player.setVelocityY(-this.players[player_position].getVelocity());
-            } else if (this.game.input.keyboard.isDown(Phaser.Keyboard.S)) {
-                this.player.setVelocityY(this.players[player_position].getVelocity());
+            }
+            else if(this.game.input.keyboard.isDown(Phaser.Keyboard.ESC)) {
+                document.querySelector(".chat").setAttribute("style","opacity:0.4");
+                document.querySelector('#msg').setAttribute("disabled","disabled");
+                this.writing = false;
             }
 
             var that = this;
@@ -476,8 +498,14 @@ function FirstScene(game) {
         while (portal.x == this.portals[next].x && this.portals[next].y == portal.y) {
             next = parseInt(Math.random() * this.portals.length);
         }
-        this.player.getSprite().x = this.portals[next].x + 120;
-        this.player.getSprite().y = this.portals[next].y + 120;
+
+        vx = this.player.getVelocityX() > 0 ? 1 : 
+            this.player.getVelocityX() == 0 ? 0:  -1;
+        vy = this.player.getVelocityY() > 0 ? 1 : 
+            this.player.getVelocityY() == 0 ? 0:  -1;
+        vx = vy == 0 && vx == 0 ? 1 : vx;  
+        this.player.getSprite().x = this.portals[next].x + (vx*100);
+        this.player.getSprite().y = this.portals[next].y + (vy*100);
         this.players[this.getIndex(player.id)].playTeleportSound();
     }
 

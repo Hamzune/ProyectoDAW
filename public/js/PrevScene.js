@@ -25,7 +25,7 @@ function PrevScene(game){
         //menu
         game.load.image('start', 'assets/menu/new_game.png');
         game.load.image('stats', 'assets/menu/estadisticas.png');
-        game.load.image('settings', 'assets/menu/settings.png');
+
         //sonidos
         game.load.audio('disparo', 'assets/audio/EfectosDeSonido/disparo2.mp3');
         game.load.audio('teleportal', 'assets/audio/EfectosDeSonido/portal.mp3');
@@ -78,9 +78,8 @@ function PrevScene(game){
         //var options = this.game.add.text(window.innerWidth/2, (window.innerHeight/2), "< OPTIONS >", { font: "65px Arial", fill: "white", align: "center" });
         //var stats = this.game.add.text(window.innerWidth/2, (window.innerHeight/2)+120, "< ESTADISTICAS >", { font: "65px Arial", fill: "white", align: "center" });
        
-        var start = this.game.add.sprite(window.innerWidth/2, (window.innerHeight/2)-100, 'start');
-        var options = this.game.add.sprite(window.innerWidth/2, (window.innerHeight/2), 'settings');
-        var stats = this.game.add.sprite(window.innerWidth/2, (window.innerHeight/2)+100, 'stats');
+        var start = this.game.add.sprite(window.innerWidth/2, (window.innerHeight/2)-50, 'start');
+        var stats = this.game.add.sprite(window.innerWidth/2, (window.innerHeight/2)+50, 'stats');
 
         //boton log out
         var boton = this.game.add.sprite(window.innerWidth-60, 60,'logout');
@@ -100,37 +99,30 @@ function PrevScene(game){
             boton.alpha = 0.2;
         })
         start.fixedToCamera = true;
-        options.fixedToCamera = true;
         stats.fixedToCamera = true;
 
         
 
         start.anchor.set(0.5);
-        options.anchor.set(0.5);
         stats.anchor.set(0.5);
 
         start.inputEnabled = true;
-        options.inputEnabled = true;
         stats.inputEnabled = true;
 
 
         start.input.useHandCursor = true;
-        options.input.useHandCursor = true;
         stats.input.useHandCursor = true;
 
 
 
         start.events.onInputOver.add(over, this);
-        options.events.onInputOver.add(over, this);
         stats.events.onInputOver.add(over, this);
 
         start.events.onInputOut.add(out, this);
-        options.events.onInputOut.add(out, this);
         stats.events.onInputOut.add(out, this);
 
         
         start.events.onInputUp.add(up, this);
-        options.events.onInputUp.add(opciones, this);
         stats.events.onInputUp.add(estadisticas, this);
 
         text = game.add.text(window.innerWidth/2-460, (window.innerHeight/2)+420, '', { font: "30pt Courier", fill: "#19cb65", stroke: "#119f4e", strokeThickness: 2 });

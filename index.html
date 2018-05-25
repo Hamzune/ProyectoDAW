@@ -99,20 +99,7 @@
                 });
        
             }
-            if(evt.keyCode == 67) {
-                //console.log("c");
-                if(document.querySelector(".chat").getAttribute("mostrado") == "true"){
-                    document.querySelector(".chat").setAttribute("style","display:none");
-                    document.querySelector(".chat").setAttribute("mostrado",false);
-                }
-                else if(document.querySelector(".chat").getAttribute("mostrado") == "false"){
-                    document.querySelector(".chat").setAttribute("style","display:block");
-                    document.querySelector(".chat").setAttribute("mostrado",true);
 
-                }
-
-                
-            }
         }
 
         
@@ -139,11 +126,12 @@
 
     <div class="estadisticas">
     </div>
-    <div class="chat" mostrado="false">
-        <form action="">
-            <input id="msg" autocomplete="off"/>
-        </form>
+    <div class="chat">
         <ul id="messages"></ul>
+        <form action="">
+            <input id="msg" autocomplete="off" disabled="disabled"/>
+        </form>
+        
     </div>
 </body>
 </html>
