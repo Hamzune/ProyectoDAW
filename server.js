@@ -34,7 +34,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
-
+// middleware para verificar si un usuario esta logeado o no
 var isLogged = function (req, res, next) {
     if (req.session.user && req.cookies.user_sid) {
         next();
@@ -42,23 +42,28 @@ var isLogged = function (req, res, next) {
         res.redirect('/login');
     }
 };
-app.get('/', isLogged, function (request, response) {
-   
+// Sirve el index
+app.get('/', isLogged, function (request, response) {   
     response.sendFile(__dirname + "/index.html");
 });
+
+// Sirve el html del login
 app.get('/login', function (request, response) {
     response.sendFile(__dirname + "/login.html");
 });
 
+// Se limipia la sesion
 app.get('/logout', function (req, res) {
     res.clearCookie('user_sid');
     res.sendFile(__dirname + "/logout.html");
 });
 
+// Sirve el html del registro
 app.get('/register', function (request, response) {
     response.sendFile(__dirname + "/register.html");
 });
 
+// Agrega los datos que se reciben por metodo GET a la BD
 app.post('/doregister', function (request, response) {
     var user = {
         username: request.body.uname,
@@ -86,6 +91,7 @@ app.post('/doregister', function (request, response) {
         });
 });
 
+// Post login para verificar los datos introducidos
 app.post('/dologin', function (request, response) {
     var user = {
         username: request.body.uname,
@@ -94,6 +100,7 @@ app.post('/dologin', function (request, response) {
 
     dbo.collection('users').find(user).toArray().then(function (data) {
         if (data.length === 1) {
+            // Se guarda una session con los datos del usuario logeado
             request.session.user = data[0];
             response.json({ status: 200, body: data[0] });
             response.end();
@@ -104,11 +111,14 @@ app.post('/dologin', function (request, response) {
     });
 });
 
+// Consulta a la BD para obtener el TOP de los mejores usuarios
 app.get('/getTop', function (request, response) {
     dbo.collection('users').find().toArray().then(function (data) {
+        // Si hay usuarios devolvemos una respuesta 200
         if (data.length > 0) {
             response.json({ status: 200, body: data });
             response.end();
+        // si no devolvemos un 401
         } else {
             response.json({ status: 401 });
             response.end();
@@ -116,6 +126,7 @@ app.get('/getTop', function (request, response) {
     });
 });
 
+// Obtener las estadisiticas de los jugadores conectados y jugando en tiempo real
 app.get('/getStat', isLogged, function (request, response) {
     dbo.collection('users').find().toArray().then(function (data) {
        var conectados = [];
@@ -138,13 +149,13 @@ app.get('/getStat', isLogged, function (request, response) {
     });
 });
 
-
-
+// Una funcion que devuelve el username del usuario logeado
 app.get('/getLoggedUser', function(req, res) {
     res.json({data: req.session.user.username});
     res.end();
 });
 
+// Deuvelve el archivo html con el TOP jugadores
 app.get('/top', isLogged, function (request, response) {
     response.sendFile(__dirname + "/top.html");
 });
